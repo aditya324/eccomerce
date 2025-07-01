@@ -17,3 +17,14 @@ const CartSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 export default mongoose.model("Cart", CartSchema);
+
+
+
+
+// const CartItemSchema = new mongoose.Schema({
+//   type: { type: String, enum: ["service", "package"], required: true },
+//   itemId: { type: mongoose.Schema.Types.ObjectId, required: true, refPath: "items.type" }, // points to either Service or Package
+//   months: Number,
+//   price: Number,
+//   subtotal: Number
+// });
