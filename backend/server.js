@@ -12,10 +12,9 @@ import path from "path";
 
 import cookieParser from "cookie-parser";
 
-import userRoutes from './routes/user.routes.js';
+import categoryRoutes from "./routes/category.routes.js";
+import userRoutes from "./routes/user.routes.js";
 import connectDB from "./utils/db.js";
-
-
 dotenv.config();
 
 const app = express();
@@ -59,11 +58,8 @@ app.get("/", (req, res) => {
   res.send("🚀 Backend is running");
 });
 
-
-app.use('/api/users', userRoutes);
-
-
-
+app.use("/api/users", userRoutes);
+app.use("/api/categories", categoryRoutes);
 
 // Start server
 app.listen(PORT, () => {
