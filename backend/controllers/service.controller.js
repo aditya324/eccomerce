@@ -62,3 +62,33 @@ export const AddService = async (req, res) => {
       .json({ message: "Failed to create service", error: err.message });
   }
 };
+
+export const getService = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const service = await Service.findById(id);
+
+    if (!service) {
+      res.status(401).json({ message: "the service is not found" });
+    }
+
+    res.status(200).json(service);
+  } catch (error) {
+    res.status(500).json({ message: "error fetching the service" });
+  }
+};
+
+export const getAllService = async (req, res) => {
+  try {
+    const service = await Service.find();
+
+    if (service.length === 0) {
+      res.status(401).json({ message: "no Services Found" });
+    }
+
+    res.status(200).json({ message: "Service Fetched Successfully",service:service } );
+  } catch (error) {
+    res.status(500).json({message:"Service fetched Successfully"})
+  }
+};

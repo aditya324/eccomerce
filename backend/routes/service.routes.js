@@ -1,22 +1,17 @@
+import express from "express";
 
+import {
+  AddService,
+  getAllService,
+  getService,
+} from "../controllers/service.controller.js";
+import protect from "../middlewares/authMiddleware.js";
+import { isAdmin } from "../middlewares/isAdmin.js";
 
+const router = express.Router();
 
-import express from "express"
-import protect from "../middlewares/authMiddleware.js"
-import { isAdmin } from "../middlewares/isAdmin.js"
-import { AddService } from "../controllers/service.controller.js"
+router.post("/addService", protect, isAdmin, AddService);
+router.get("/getAllService", getAllService);
+router.get("/:id", getService);
 
-
-
-const router= express.Router()
-
-
-router.post("/addService",protect,isAdmin, AddService)
-
-
-
-
-
-
-
-export default router
+export default router;
