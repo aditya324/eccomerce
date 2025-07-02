@@ -32,6 +32,14 @@ const ServiceSchema = new mongoose.Schema(
     isFeatured: { type: Boolean, default: false },
   },
   { timestamps: true }
+
+  
 );
+
+ServiceSchema.index({
+  title:       "text",
+  description: "text",
+  includes:    "text"
+});
 
 export default mongoose.model("Service", ServiceSchema);

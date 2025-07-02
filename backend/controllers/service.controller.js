@@ -92,3 +92,33 @@ export const getAllService = async (req, res) => {
     res.status(500).json({message:"Service fetched Successfully"})
   }
 };
+export const searchServices = async (req, res) => {
+  const { q } = req.query;
+
+
+  console.log("query", q)
+
+  if (!q || q.trim() === "") {
+    return res.status(400).json({ message: "Search query is required" });
+  }
+
+  try {
+
+    const services = await Service
+      .find(
+        { $text: { $search: q } },
+        { score: { $meta: "textScore" } }
+      )
+      .sort({ score: -1 })            
+      .select("title slug thumbnail price score")
+      .lean();
+
+    res.json({service:services});
+  } catch (err) {
+    console.error("Search error:", err);
+    res.status(500).json({ message: "Failed to search services", error: err.message });
+  }
+};
+
+
+
