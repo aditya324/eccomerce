@@ -13,6 +13,7 @@ import path from "path";
 import cookieParser from "cookie-parser";
 
 import categoryRoutes from "./routes/category.routes.js";
+import serviceRoutes from "./routes/service.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import connectDB from "./utils/db.js";
 dotenv.config();
@@ -60,6 +61,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/service",serviceRoutes)
 
 // Start server
 app.listen(PORT, () => {

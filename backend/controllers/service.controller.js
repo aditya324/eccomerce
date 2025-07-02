@@ -1,0 +1,64 @@
+import Category from "../models/category.model.js";
+import Service from "../models/service.model.js";
+
+export const AddService = async (req, res) => {
+  const {
+    title,
+    slug,
+    categoryId,
+    vendorName,
+    price,
+    thumbnail,
+    videoUrl,
+    includes,
+    description,
+    packages,
+    faqs,
+    rating,
+    isFeatured,
+  } = req.body;
+
+  if (!title || !slug || !categoryId) {
+    return res
+      .status(400)
+      .json({ message: "Title, slug and categoryId are required." });
+  }
+
+  try {
+    const category = await Category.findById(categoryId);
+
+    if (!category) {
+      return res.status(404).json({ message: "category not found" });
+    }
+
+    const existingService = await Service.findOne({ slug });
+
+    if (existingService) {
+      return res.status(400).json({ message: "Slug already in use." });
+    }
+
+    const service = new Service({
+      title,
+      slug,
+      categoryId,
+      vendorName,
+      price,
+      thumbnail,
+      videoUrl,
+      includes,
+      description,
+      packages,
+      faqs,
+      rating: rating ?? 0,
+      isFeatured: isFeatured ?? false,
+    });
+
+    const created = await service.save();
+    res.status(201).json(created);
+  } catch (error) {
+    console.error("Create service error:", err);
+    res
+      .status(500)
+      .json({ message: "Failed to create service", error: err.message });
+  }
+};
