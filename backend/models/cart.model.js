@@ -1,11 +1,21 @@
 import mongoose from "mongoose";
 
 const CartItemSchema = new mongoose.Schema({
-  serviceId: { type: mongoose.Schema.Types.ObjectId, ref: "Service", required: true },
+  itemId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    refPath: 'items.itemType'
+  },
+  itemType: {
+    type: String,
+    required: true,
+    enum: ['Service', 'Package']
+  },
   months: { type: Number, required: true },
   price: { type: Number, required: true },
   subtotal: { type: Number, required: true }
 });
+
 
 const CartSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
