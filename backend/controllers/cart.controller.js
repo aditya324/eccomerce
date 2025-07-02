@@ -60,3 +60,25 @@ export const addToCart = async (req, res) => {
     return res.status(500).json({ message: "Failed to add to cart" });
   }
 };
+
+export const getCart = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const cart = await Cart.findOne({ userId }).populate({
+      path: "items.itemId",
+      model: function(doc) {
+        return doc.itemType;
+      }
+    });
+
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+
+    res.status(200).json(cart);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch cart" });
+  }
+};
