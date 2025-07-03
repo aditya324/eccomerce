@@ -2,15 +2,16 @@ import mongoose from "mongoose";
 
 const PackageSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true }, // e.g. "Pro Plan"
+    title: { type: String, required: true }, 
     slug: { type: String, required: true, unique: true },
-    price: { type: Number, required: true }, // ₹75000
+    price: { type: Number, required: true }, 
     billingCycle: { type: String, enum: ["monthly", "yearly"], default: "monthly" },
+     planId: { type: String },
 
-    serviceIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Service" }], // bundle
+    serviceIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Service" }], 
 
-    features: [String], // extra notes like "Website + SEO + UIUX"
-    category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" }, // optional grouping
+    features: [String], 
+    category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
 
     isFeatured: { type: Boolean, default: false }
   },

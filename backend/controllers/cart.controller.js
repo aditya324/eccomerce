@@ -5,59 +5,43 @@ import Service from "../models/service.model.js";
 
 export const addToCart = async (req, res) => {
   const userId = req.user._id;
-  const { itemId, itemType, months } = req.body;
+  const { itemId, itemType, months, price } = req.body;
 
-  if (!itemId || !itemType || !months) {
-    return res.status(400).json({ message: "itemId, itemType, and months are required" });
+  if (!itemId || !itemType || !months || !price) {
+    return res.status(400).json({ message: "Missing fields." });
   }
 
   try {
-    const Model = itemType === "Service" ? Service : Package;
-    const item = await Model.findById(itemId);
-
-    if (!item) {
-      return res.status(404).json({ message: `${itemType} not found` });
-    }
-
-    const price = item.price;
-    const subtotalItem = price * months;
-
     let cart = await Cart.findOne({ userId });
+
+    const subtotal = price * months;
+
+    const newItem = {
+      itemId,
+      itemType,
+      months,
+      price,
+      subtotal,
+    };
 
     if (!cart) {
       cart = new Cart({
         userId,
-        items: [{
-          itemId,
-          itemType,
-          months,
-          price,
-          subtotal: subtotalItem
-        }],
-        subtotal: subtotalItem,
-        total: subtotalItem
+        items: [newItem],
+        subtotal,
+        total: subtotal,
       });
     } else {
-      const index = cart.items.findIndex(
-        (i) => i.itemId.toString() === itemId && i.itemType === itemType
-      );
-
-      if (index > -1) {
-        cart.items[index].months = months;
-        cart.items[index].subtotal = subtotalItem;
-      } else {
-        cart.items.push({ itemId, itemType, months, price, subtotal: subtotalItem });
-      }
-
-      cart.subtotal = cart.items.reduce((sum, i) => sum + i.subtotal, 0);
+      cart.items.push(newItem);
+      cart.subtotal = cart.items.reduce((acc, item) => acc + item.subtotal, 0);
       cart.total = cart.subtotal - (cart.discount || 0);
     }
 
-    await cart.save();
-    return res.status(200).json(cart);
+    const saved = await cart.save();
+    res.status(200).json(saved);
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Failed to add to cart" });
+    console.error("Cart add error:", err);
+    res.status(500).json({ message: "Failed to add to cart" });
   }
 };
 
@@ -67,18 +51,16 @@ export const getCart = async (req, res) => {
 
     const cart = await Cart.findOne({ userId }).populate({
       path: "items.itemId",
-      model: function(doc) {
+      model: function (doc) {
         return doc.itemType;
-      }
+      },
     });
 
-    if (!cart) {
-      return res.status(404).json({ message: "Cart not found" });
-    }
+    if (!cart) return res.status(404).json({ message: "Cart is empty" });
 
     res.status(200).json(cart);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Failed to fetch cart" });
+    res.status(500).json({ message: "Error fetching cart" });
   }
 };

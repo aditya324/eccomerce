@@ -4,6 +4,7 @@ const PackageSchema = new mongoose.Schema({
   price: Number,
   billingCycle: { type: String, default: "monthly" },
   features: [String],
+  planId: { type: String },
 });
 
 const FAQSchema = new mongoose.Schema({
@@ -32,14 +33,12 @@ const ServiceSchema = new mongoose.Schema(
     isFeatured: { type: Boolean, default: false },
   },
   { timestamps: true }
-
-  
 );
 
 ServiceSchema.index({
-  title:       "text",
+  title: "text",
   description: "text",
-  includes:    "text"
+  includes: "text",
 });
 
 export default mongoose.model("Service", ServiceSchema);

@@ -19,20 +19,18 @@ export const AddService = async (req, res) => {
   } = req.body;
 
   if (!title || !slug || !categoryId) {
-    return res
-      .status(400)
-      .json({ message: "Title, slug and categoryId are required." });
+    return res.status(400).json({
+      message: "Title, slug and categoryId are required.",
+    });
   }
 
   try {
     const category = await Category.findById(categoryId);
-
     if (!category) {
-      return res.status(404).json({ message: "category not found" });
+      return res.status(404).json({ message: "Category not found." });
     }
 
     const existingService = await Service.findOne({ slug });
-
     if (existingService) {
       return res.status(400).json({ message: "Slug already in use." });
     }
@@ -47,7 +45,7 @@ export const AddService = async (req, res) => {
       videoUrl,
       includes,
       description,
-      packages,
+      packages, // includes array of packages with their own planIds
       faqs,
       rating: rating ?? 0,
       isFeatured: isFeatured ?? false,
@@ -55,11 +53,9 @@ export const AddService = async (req, res) => {
 
     const created = await service.save();
     res.status(201).json(created);
-  } catch (error) {
+  } catch (err) {
     console.error("Create service error:", err);
-    res
-      .status(500)
-      .json({ message: "Failed to create service", error: err.message });
+    res.status(500).json({ message: "Failed to create service", error: err.message });
   }
 };
 
@@ -73,7 +69,20 @@ export const getService = async (req, res) => {
       res.status(401).json({ message: "the service is not found" });
     }
 
+
+  
+
+    const descriptionPoints = service.description
+      .split(".")
+      .map((point) => point.trim())
+      .filter(Boolean);
+
+    
+
+    service.description = descriptionPoints;
+
     res.status(200).json(service);
+
   } catch (error) {
     res.status(500).json({ message: "error fetching the service" });
   }
