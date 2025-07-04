@@ -1,7 +1,11 @@
 // controllers/userController.js
 import bcrypt from "bcryptjs";
 
+import { OAuth2Client } from "google-auth-library";
+
 import User from "../models/user.model.js";
+
+
 
 import generateToken from "../utils/genrerateToken.js"
 
@@ -18,7 +22,12 @@ export const registerUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hashedPassword, role });
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+    });
 
     // 1. Generate token
     const token = generateToken(user._id);
@@ -99,5 +108,55 @@ export const getUserById = async (req, res) => {
   } catch (error) {
     console.error("Fetch user error:", error);
     res.status(500).json({ message: "Failed to fetch user" });
+  }
+};
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+
+export const googleAuth = async (req, res) => {
+  const { idToken } = req.body;
+  if (!idToken) {
+    return res.status(400).json({ message: "Google ID token is required" });
+  }
+
+  try {
+    // 1. Verify the token with Google
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name, picture: avatar } = payload;
+
+    // 2. Find or create the user
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = await User.create({ name, email, googleId, avatar });
+    }
+
+    // 3. Generate your JWT
+    const token = generateToken(user._id);
+
+    // 4. (Optional) set cookie
+    res.cookie("jwt", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+
+    // 5. Return user + token
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      avatar: user.avatar,
+      token,
+    });
+  } catch (err) {
+    console.error("Google auth error:", err);
+    res.status(401).json({ message: "Google token verification failed" });
   }
 };
