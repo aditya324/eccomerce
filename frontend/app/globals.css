@@ -120,3 +120,29 @@
     @apply bg-background text-foreground;
   }
 }
+
+.font-quicksand {
+  @apply text-base;
+  font-family: var(--font-quicksand);
+}
+
+.font-popins {
+  @apply text-2xl font-semibold;
+  font-family: var(--font-poppins);
+}
+
+
+/* Remove padding/margin that slick adds sometimes */
+.slick-slide > div {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.slick-list {
+  overflow: hidden;
+}
+
+
+
+/* Force slick-slide to respect our size */
+

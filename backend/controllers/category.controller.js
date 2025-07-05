@@ -72,7 +72,7 @@ export const getCategoryBySlug = async (req, res) => {
       .select("title slug thumbnail price isFeatured rating")  // ← added price
       .sort({ title: 1 });
 
-    return res.json({ category, services });
+    return res.json({ data:category, services });
   } catch (err) {
     console.error("Fetch category error:", err);
     return res

@@ -5,26 +5,20 @@ import { Providers } from "./providers";
 import { Toaster } from "sonner";
 import Navbar from "@/components/Navbar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
 const quickSand = Quicksand({
   weight: ["300", "400", "600"],
   style: ["normal"],
   subsets: ["latin"],
+  display: "swap",
+  variable: "--font-quicksand",
 });
 
 const popins = Poppins({
   weight: ["500", "400", "600"],
   style: ["normal"],
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-poppins",
 });
 
 export const metadata: Metadata = {
@@ -39,12 +33,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Navbar/>
+      <Navbar />
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${quickSand.className} ${popins.className} antialiased`}
+        className={`$ ${quickSand.variable} ${popins.variable} antialiased `}
       >
-          <Providers>{children}</Providers>
-            <Toaster position="top-right" />
+        <Providers>{children}</Providers>
+        <Toaster position="top-right" />
       </body>
     </html>
   );
