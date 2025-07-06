@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "sonner";
 import Navbar from "@/components/Navbar";
+import AppLayout from "@/components/AppLayout";
 
 const quickSand = Quicksand({
   weight: ["300", "400", "600"],
@@ -33,12 +34,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Navbar />
-      <body
-        className={`$ ${quickSand.variable} ${popins.variable} antialiased `}
-      >
-        <Providers>{children}</Providers>
-        <Toaster position="top-right" />
+      <body className={`${quickSand.variable} ${popins.variable} antialiased`}>
+        <Providers>
+          <AppLayout>{children}</AppLayout>
+          <Toaster position="top-right" />
+        </Providers>
       </body>
     </html>
   );

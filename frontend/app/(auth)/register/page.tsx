@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import Link from "next/link";
 import { useGoogleLogin, useRegister } from "@/hooks/useauth";
-import axios from "axios";
+
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
