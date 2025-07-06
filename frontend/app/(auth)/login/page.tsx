@@ -3,9 +3,11 @@
 import { Button } from "@/components/ui/button";
 
 import { Input } from "@/components/ui/input";
-import { useLogin } from "@/hooks/useauth";
+import { useGoogleLogin, useLogin } from "@/hooks/useauth";
+import { GoogleLogin } from "@react-oauth/google";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -17,6 +19,10 @@ export default function LoginPage() {
 
   const login = useLogin();
 
+  const router=useRouter()
+
+  const googleLogin = useGoogleLogin();
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -24,18 +30,25 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     login.mutate(form, {
-      onSuccess: () => {
-        toast.success("account logged in successfully");
-        setForm({ email: "", password: "" });
-      },
-      onError: (err: unknown) => {
-        if (err instanceof Error) {
-          toast.error(err.message);
-        } else {
-          toast.error("Registration failed");
-        }
-      },
-    });
+  onSuccess: (data: any) => {
+    toast.success("account logged in successfully");
+    console.log(data, "login data")
+    if (data?.user?.role === "admin" || data?.role === "admin") {
+      router.push("/dashboard");
+    } else {
+      router.push("/"); // or wherever users go
+    }
+
+    setForm({ email: "", password: "" });
+  },
+  onError: (err: unknown) => {
+    if (err instanceof Error) {
+      toast.error(err.message);
+    } else {
+      toast.error("Login failed");
+    }
+  },
+});
   };
 
   return (
@@ -102,24 +115,33 @@ export default function LoginPage() {
             </Button>
 
             {/* Google Signup */}
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full flex gap-2 items-center justify-center h-12"
-            >
-              <svg
-                className="w-5 h-5"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 48 48"
-              >
-                <path
-                  fill="#FFC107"
-                  d="M43.6 20.5H42V20H24v8h11.3C33.4 32.2 29.1 35 24 35..."
-                />
-                {/* ...rest of SVG paths */}
-              </svg>
-              Log in with Google
-            </Button>
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                const idToken = credentialResponse.credential;
+
+                if (!idToken) {
+                  toast.error("No ID token received");
+                  return;
+                }
+
+                googleLogin.mutate(
+                  { idToken },
+                  {
+                    onSuccess: (data) => {
+                      toast.success("Login successful!");
+                      console.log("User:", data);
+                      // router.push("/dashboard"); // or store in context/localStorage
+                    },
+                    onError: (err: any) => {
+                      toast.error(
+                        err?.response?.data?.message || "Google login failed"
+                      );
+                    },
+                  }
+                );
+              }}
+              onError={() => toast.error("Google login failed")}
+            />
 
             {/* Login Link */}
             <p className="text-sm text-gray-600 text-center mt-4">

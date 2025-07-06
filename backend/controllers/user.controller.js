@@ -1,9 +1,8 @@
 // controllers/userController.js
 import bcrypt from "bcryptjs";
 
-import { OAuth2Client } from "google-auth-library";
-
 import User from "../models/user.model.js";
+import { client } from "../utils/googleClient.js";
 
 
 
@@ -111,7 +110,7 @@ export const getUserById = async (req, res) => {
   }
 };
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 
 
 export const googleAuth = async (req, res) => {

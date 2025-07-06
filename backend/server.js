@@ -28,7 +28,7 @@ connectDB();
 
 // Middlewares
 app.use(cors({
-  origin: "*",
+  origin: ["http://localhost:3001","http://localhost:3000"], // your frontend port
   credentials: true,
 }));
 app.use(cookieParser());

@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-
+import { GoogleLogin } from "@react-oauth/google";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import Link from "next/link";
-import { useRegister } from "@/hooks/useauth";
+import { useGoogleLogin, useRegister } from "@/hooks/useauth";
+import axios from "axios";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -17,6 +18,7 @@ export default function RegisterPage() {
   });
 
   const register = useRegister();
+  const googleLogin = useGoogleLogin();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -111,20 +113,33 @@ export default function RegisterPage() {
               {register.isPending ? "Creating..." : "Create Account"}
             </Button>
 
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full flex gap-2 items-center justify-center h-12"
-            >
-              <svg
-                className="w-5 h-5"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 48 48"
-              >
-                {/* SVG paths go here */}
-              </svg>
-              Sign up with Google
-            </Button>
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                const idToken = credentialResponse.credential;
+
+                if (!idToken) {
+                  toast.error("No ID token received");
+                  return;
+                }
+
+                googleLogin.mutate(
+                  { idToken },
+                  {
+                    onSuccess: (data) => {
+                      toast.success("sign up successful!");
+                      console.log("User:", data);
+                      // router.push("/dashboard"); // or store in context/localStorage
+                    },
+                    onError: (err: any) => {
+                      toast.error(
+                        err?.response?.data?.message || "Google login failed"
+                      );
+                    },
+                  }
+                );
+              }}
+              onError={() => toast.error("Google login failed")}
+            />
 
             <p className="text-sm text-gray-600 text-center mt-4">
               Already have account?{" "}

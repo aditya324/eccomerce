@@ -9,19 +9,14 @@ import OutOfHome from "@/components/OutOfHome";
 
 export default function Home() {
   return (
-   <div>
-     <CategoriesSection/>
-     <HomeScreen/>
-     <AllService/>
-     <DevelopMent/>
-     <Marketing/>
-     <Sales/>
-     <OutOfHome/>
-
-
-
-
-
+    <div className="bg-[radial-gradient(circle,_rgba(242,177,4,0.14)_0%,_rgba(242,177,4,0)_100%)]">
+      <CategoriesSection />
+      <HomeScreen />
+      <AllService />
+      <DevelopMent />
+      <Marketing />
+      <Sales />
+      <OutOfHome />
     </div>
   );
 }
