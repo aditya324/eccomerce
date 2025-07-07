@@ -26,7 +26,10 @@ const ServiceSchema = new mongoose.Schema(
     thumbnail: String,
     videoUrl: String,
     includes: [String],
-    description: String,
+    description: {
+  type: [String], 
+  default: [],
+},
     packages: [PackageSchema],
     faqs: [FAQSchema],
     rating: { type: Number, default: 0 },
