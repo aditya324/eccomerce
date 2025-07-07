@@ -64,6 +64,12 @@ app.get("/", (req, res) => {
   res.send("🚀 Backend is running");
 });
 
+
+app.get('/api/test-cookies', (req, res) => {
+  console.log('Cookies:', req.cookies);
+  res.json({ cookies: req.cookies });
+});
+
 app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/service",serviceRoutes)

@@ -4,6 +4,7 @@ import HomeScreen from "../components/HomeScreen"
 import DevelopMent from "@/components/Development";
 import Marketing from "@/components/Marketing";
 import Sales from "@/components/Sales";
+import PackageSection from "@/components/PackageSection"
 
 import OutOfHome from "@/components/OutOfHome";
 
@@ -14,6 +15,7 @@ export default function Home() {
       <HomeScreen />
       <AllService />
       <DevelopMent />
+      <PackageSection/>
       <Marketing />
       <Sales />
       <OutOfHome />

@@ -96,3 +96,29 @@ export const getPackageById = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch package" });
   }
 };
+
+
+
+
+
+export const getPacakgeByCategory = async (req, res)=>{
+ const { slug } = req.params
+
+  try {
+ 
+    const category = await Category.findOne({ slug })
+    if (!category) {
+      return res.status(404).json({ message: 'Category not found' })
+    }
+
+
+    const plans = await Package.find({ category: category._id })
+
+
+    return res.json(plans)
+  } catch (err) {
+    console.error('Failed to load plans', err)
+    return res.status(500).json({ message: 'Failed to load plans' })
+  }
+}
+
