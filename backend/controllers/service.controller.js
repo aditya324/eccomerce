@@ -129,3 +129,27 @@ export const searchServices = async (req, res) => {
       .json({ message: "Failed to search services", error: err.message });
   }
 };
+
+
+
+
+
+
+export const deleteService = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const service = await Service.findById(id);
+
+    if (!service) {
+      return res.status(404).json({ message: "Service not found." });
+    }
+
+    await service.deleteOne(); // or: await Service.findByIdAndDelete(id);
+
+    res.status(200).json({ message: "Service deleted successfully." });
+  } catch (error) {
+    console.error("Delete service error:", error);
+    res.status(500).json({ message: "Failed to delete service", error: error.message });
+  }
+};

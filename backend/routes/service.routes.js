@@ -2,6 +2,7 @@ import express from "express";
 
 import {
   AddService,
+  deleteService,
   getAllService,
   getService,
   searchServices,
@@ -19,7 +20,7 @@ router.get("/getAllService", getAllService);
 
 console.log('Loaded service routes with SEARCH first');
 router.get("/search", searchServices);
-
+router.delete("/deleteService/:id", protect, isAdmin, deleteService);
 
 router.get("/:id", getService);
 

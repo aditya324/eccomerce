@@ -1,14 +1,18 @@
 // controllers/userController.js
 import bcrypt from "bcryptjs";
 
+import jwt from "jsonwebtoken";
+
+import dotenv from "dotenv";
+
 import User from "../models/user.model.js";
 import { client } from "../utils/googleClient.js";
-
+dotenv.config();
 
 
 import generateToken from "../utils/genrerateToken.js"
 
-// @route   POST /api/users
+
 export const registerUser = async (req, res) => {
   const { name, email, password, role } = req.body;
   if (!name || !email || !password) {
@@ -58,7 +62,7 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// @route   POST /api/users/login
+
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -98,7 +102,7 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// @route   GET /api/users/:id
+
 export const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-password");
@@ -157,5 +161,27 @@ export const googleAuth = async (req, res) => {
   } catch (err) {
     console.error("Google auth error:", err);
     res.status(401).json({ message: "Google token verification failed" });
+  }
+};
+
+
+
+// backend/controllers/auth.controller.js
+export const checkAuth = (req, res) => {
+  try {
+    const token = req.cookies.jwt;
+    console.log("token check", token);
+
+    if (!token) {
+      return res.status(401).json({ isLoggedIn: false });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("decoded payload", decoded);
+
+    return res.status(200).json({ isLoggedIn: true });
+  } catch (err) {
+    console.error("JWT verification failed:", err.message);
+    return res.status(401).json({ isLoggedIn: false });
   }
 };
