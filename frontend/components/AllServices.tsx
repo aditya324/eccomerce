@@ -4,6 +4,8 @@ import { useService } from "@/hooks/useService";
 import { Service } from "@/types/service";
 import ServiceCard from "@/components/ServiceCard";
 import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 export default function AllService() {
   const { data, isLoading, isError } = useService();
@@ -16,9 +18,14 @@ export default function AllService() {
     dots: false,
     infinite: true,
     speed: 500,
-    slidesToShow: 4,
+    slidesToShow: 5,
     slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    swipeToSlide: true,
+    arrows: true,
     responsive: [
+    
       { breakpoint: 1280, settings: { slidesToShow: 4 } },
       { breakpoint: 1024, settings: { slidesToShow: 3 } },
       { breakpoint: 768, settings: { slidesToShow: 2 } },
@@ -35,8 +42,6 @@ export default function AllService() {
       <Slider {...settings}>
         {data.service.map((service: Service) => (
           <div key={service._id} className="px-5">
-            {" "}
-            {/* override slick spacing */}
             <ServiceCard service={service} />
           </div>
         ))}

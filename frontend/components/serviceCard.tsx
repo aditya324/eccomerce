@@ -1,12 +1,14 @@
+"use client"
 import { Service } from "@/types/service";
 import Image from "next/image";
-
+import { useRouter } from "next/navigation";
 
 interface Props {
   service: Service;
 }
 
 export default function ServiceCard({ service }: Props) {
+  const router = useRouter();
   return (
     <div
       className="
@@ -14,6 +16,7 @@ export default function ServiceCard({ service }: Props) {
         h-[300px] sm:h-[280px] md:h-[290px] lg:h-[300px]
         bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden
       "
+      onClick={() => router.push(`/service/${service._id}`)}
     >
       <div className="relative w-full h-[160px]">
         <Image
@@ -40,5 +43,3 @@ export default function ServiceCard({ service }: Props) {
     </div>
   );
 }
-
-
