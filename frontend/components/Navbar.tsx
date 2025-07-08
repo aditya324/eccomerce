@@ -76,7 +76,7 @@ export default function Navbar() {
               {results.map((service) => (
                 <Link
                   key={service._id}
-                  href={`/services/${service.slug}`}
+                  href={`/service/${service._id}`}
                   className="flex items-center gap-4 px-4 py-2 hover:bg-gray-100"
                 >
                   <img
@@ -144,7 +144,7 @@ export default function Navbar() {
                     href={`/services/${service.slug}`}
                     className="flex items-center gap-4 px-4 py-2 hover:bg-gray-100"
                   >
-                    <img
+                    <Image
                       src={service.thumbnail}
                       alt={service.title}
                       className="w-12 h-12 object-cover rounded"
