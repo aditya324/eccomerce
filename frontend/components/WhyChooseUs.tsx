@@ -4,14 +4,14 @@ import { Check } from "lucide-react";
 
 export default function WhyChooseUs() {
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12 grid md:grid-cols-2 gap-6 bg-gradient-to-br from-[#fff] to-[#fef8ee]">
+    <div className=" mx-auto px-20 py-12 flex flex-col md:flex-row justify-evenly gap-6">
       {/* Left Box */}
-      <div className="border p-6 rounded-md">
-        <h3 className="text-xl font-bold mb-6 text-gray-800">
+      <div className="w-[644px] h-[334px] border border-gray-300 rounded-md p-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-6 leading-snug">
           Why Choose Our <br />
           UI/UX Design Services?
         </h3>
-        <ul className="space-y-4 text-gray-700">
+        <ul className="space-y-4 text-gray-800">    
           {[
             "we collaborate asynchronously",
             "we send updates and announcements",
@@ -19,18 +19,18 @@ export default function WhyChooseUs() {
           ].map((item, i) => (
             <li key={i} className="flex items-start gap-3">
               <Check className="text-black w-5 h-5 mt-1" />
-              <span>{item}</span>
+              <span className="text-base">{item}</span>
             </li>
           ))}
         </ul>
       </div>
 
       {/* Right Box */}
-      <div className="border p-6 rounded-md">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">What We Will Do:</h3>
-        <p className="text-gray-700 text-lg leading-relaxed">
-          At Sunrise Digital, we focus on creating not just beautiful designs but user-centric,
-          high-performing interfaces
+      <div className="w-[644px] h-[334px] border border-gray-300 rounded-md p-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-4">What We Will Do:</h3>
+        <p className="text-gray-800 text-lg leading-relaxed">
+          At Sunrise Digital, we focus on creating not just beautiful designs but
+          user-centric, high-performing interfaces.
         </p>
       </div>
     </div>
