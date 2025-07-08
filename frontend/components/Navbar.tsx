@@ -19,6 +19,24 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
+   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+
+    useEffect(() => {
+    const checkLogin = async () => {
+      try {
+        const res = await axios.get(`${BASEURL}/users/check`, {
+          withCredentials: true, // ✅ send cookies
+        });
+        setIsLoggedIn(res.data.isLoggedIn);
+        console.log(res)
+      } catch (error) {
+        setIsLoggedIn(false); // fallback
+      }
+    };
+
+    checkLogin();
+  }, []);
 
   // Debounced search function
   const debouncedSearch = useCallback(
@@ -96,16 +114,28 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Icons */}
-        <div className="hidden lg:flex items-center space-x-6 text-gray-700">
-          <Heart className="w-6 h-6 cursor-pointer hover:text-yellow-500" />
-          <div className="relative cursor-pointer hover:text-yellow-500">
-            <ShoppingCart className="w-6 h-6" />
-            <span className="absolute -top-2 -right-2 text-xs bg-yellow-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
-              2
-            </span>
-          </div>
-          <User className="w-6 h-6 cursor-pointer hover:text-yellow-500" />
-        </div>
+       <div className="hidden lg:flex items-center space-x-6 text-gray-700">
+  {isLoggedIn ? (
+    <>
+      <Heart className="w-6 h-6 cursor-pointer hover:text-yellow-500" />
+      <div className="relative cursor-pointer hover:text-yellow-500">
+        <ShoppingCart className="w-6 h-6" />
+        <span className="absolute -top-2 -right-2 text-xs bg-yellow-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+          2
+        </span>
+      </div>
+      <User className="w-6 h-6 cursor-pointer hover:text-yellow-500" />
+    </>
+  ) : (
+    <Link
+      href="/login"
+      className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
+    >
+      Login
+    </Link>
+  )}
+</div>
+
 
         {/* Hamburger */}
         <button

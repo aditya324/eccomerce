@@ -65,24 +65,30 @@ export const getService = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const service = await Service.findById(id);
+    const service = await Service.findById(id).lean();
 
     if (!service) {
-      res.status(401).json({ message: "the service is not found" });
+      return res.status(404).json({ message: "Service not found" });
     }
 
-    const descriptionPoints = service.description
+    // Safe check: Make sure description is a string before splitting
+    const descriptionText = typeof service.description === "string" ? service.description : "";
+
+    const descriptionPoints = descriptionText
       .split(".")
       .map((point) => point.trim())
       .filter(Boolean);
 
+    // Return the points as array, don't overwrite Mongoose doc directly
     service.description = descriptionPoints;
 
-    res.status(200).json(service);
+    return res.status(200).json(service);
   } catch (error) {
-    res.status(500).json({ message: "error fetching the service" });
+    console.error("❌ Error fetching service by ID:", error);
+    return res.status(500).json({ message: "Error fetching the service" });
   }
 };
+
 
 export const getAllService = async (req, res) => {
   try {
