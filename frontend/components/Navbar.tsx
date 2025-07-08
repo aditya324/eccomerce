@@ -13,6 +13,7 @@ import {
   ShoppingCart,
   User,
 } from "lucide-react";
+import { BASEURL } from "@/constants";
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -28,7 +29,7 @@ export default function Navbar() {
       }
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/service/search?q=${encodeURIComponent(searchTerm)}`
+          `${BASEURL}/service/search?q=${encodeURIComponent(searchTerm)}`
         );
         setResults(res.data?.service || []);
       } catch (error) {
