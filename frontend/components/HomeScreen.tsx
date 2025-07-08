@@ -29,7 +29,7 @@ export default function FullScreenSlider() {
       <Slider {...settings}>
         {images.map((img, idx) => (
           <div key={idx}>
-            <img
+            <img  
               src={img}
               alt={`slide-${idx}`}
               className="w-screen h-screen object-cover"
