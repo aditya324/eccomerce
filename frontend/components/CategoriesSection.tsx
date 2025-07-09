@@ -4,15 +4,22 @@ import { useCategories } from "@/hooks/useCategories";
 import { useCategoryServices } from "@/hooks/useCategoryServices";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import Link from "next/link";
 
 export default function CategoriesSection() {
   const { data, isLoading, error } = useCategories();
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
 
-  const { services, isLoading: servicesLoading } = useCategoryServices(activeSlug || undefined);
+  const { services, isLoading: servicesLoading } = useCategoryServices(
+    activeSlug || undefined
+  );
 
-  if (isLoading) return <p className="text-center py-4">Loading categories...</p>;
-  if (error) return <p className="text-center py-4 text-red-500">Failed to load categories</p>;
+  if (isLoading)
+    return <p className="text-center py-4">Loading categories...</p>;
+  if (error)
+    return (
+      <p className="text-center py-4 text-red-500">Failed to load categories</p>
+    );
 
   return (
     <div className="py-8">
@@ -41,20 +48,25 @@ export default function CategoriesSection() {
             {activeSlug === cat.slug && (
               <div className="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 absolute top-full mt-3 w-60 bg-white text-gray-700 shadow-xl border rounded-lg p-3 z-50">
                 {servicesLoading ? (
-                  <p className="text-center text-sm text-gray-400">Loading...</p>
+                  <p className="text-center text-sm text-gray-400">
+                    Loading...
+                  </p>
                 ) : services.length === 0 ? (
-                  <p className="text-center text-sm text-gray-400">No services found</p>
+                  <p className="text-center text-sm text-gray-400">
+                    No services found
+                  </p>
                 ) : (
-                  <ul className="space-y-2 text-sm">
+                  <div className="space-y-2">
                     {services.map((s: any) => (
-                      <li
+                      <Link
+                        href={`/service/${s._id}`}
                         key={s._id}
-                        className="hover:text-yellow-500 transition-all cursor-pointer"
+                        className="block text-[#333333] hover:text-yellow-500 transition-all"
                       >
                         {s.title}
-                      </li>
+                      </Link>
                     ))}
-                  </ul>
+                  </div>
                 )}
               </div>
             )}
