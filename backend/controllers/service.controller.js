@@ -71,16 +71,22 @@ export const getService = async (req, res) => {
       return res.status(404).json({ message: "Service not found" });
     }
 
-    // Safe check: Make sure description is a string before splitting
-    const descriptionText = typeof service.description === "string" ? service.description : "";
+    let descriptionPoints = [];
 
-    const descriptionPoints = descriptionText
-      .split(".")
-      .map((point) => point.trim())
-      .filter(Boolean);
+    if (typeof service.description === "string") {
+      // Convert string to array
+      descriptionPoints = service.description
+        .split(".")
+        .map((point) => point.trim())
+        .filter(Boolean);
+    } else if (Array.isArray(service.description)) {
+      // Already an array
+      descriptionPoints = service.description;
+    }
 
-    // Return the points as array, don't overwrite Mongoose doc directly
     service.description = descriptionPoints;
+
+    console.log("✅ Final Parsed Description Array:", service.description);
 
     return res.status(200).json(service);
   } catch (error) {
@@ -151,9 +157,7 @@ export const updateService = async (req, res) => {
     isFeatured,
   } = req.body;
 
-
-
-  console.log(req.body)
+  console.log(req.body);
 
   try {
     const service = await Service.findById(id);
@@ -162,7 +166,7 @@ export const updateService = async (req, res) => {
       return res.status(404).json({ message: "Service not found." });
     }
 
-    // Optional: check if slug already exists for a different service
+    
     if (slug && slug !== service.slug) {
       const slugExists = await Service.findOne({ slug });
       if (slugExists) {
@@ -201,5 +205,17 @@ export const updateService = async (req, res) => {
     res
       .status(500)
       .json({ message: "Failed to update service", error: error.message });
+  }
+};
+
+export const getExceptService = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const service = await Service.find({ _id: { $ne: id } });
+
+    res.status(200).json({ service });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching services", error });
   }
 };

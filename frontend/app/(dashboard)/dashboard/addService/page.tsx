@@ -21,7 +21,7 @@ const serviceSchema = z.object({
   price: z.coerce.number().nonnegative(),
   thumbnail: z.string().url(),
   videoUrl: z.string().url(),
-  description: z.string().min(10),
+  description: z.array(z.string().min(5)).min(1),
   includes: z.array(z.string().min(1)),
   packages: z.array(
     z.object({
@@ -74,6 +74,12 @@ export default function AddServicePage() {
     name: "faqs",
   });
 
+  const { fields: descriptionFields, append: appendDescription } =
+    useFieldArray({
+      control,
+      name: "description",
+    });
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -103,6 +109,8 @@ export default function AddServicePage() {
     }
   };
 
+  
+
   return (
     <>
       <div className="flex justify-center px-4">
@@ -123,7 +131,7 @@ export default function AddServicePage() {
             </CardContent>
           </Card>
 
-          {/* CATEGORY & VENDOR */}
+         
           <Card className="col-span-1">
             <CardHeader>
               <CardTitle>Vendor Info</CardTitle>
@@ -165,12 +173,16 @@ export default function AddServicePage() {
             <CardHeader>
               <CardTitle>Description</CardTitle>
             </CardHeader>
-            <CardContent>
+            {descriptionFields.map((field, idx) => (
               <Textarea
-                {...register("description")}
-                placeholder="Service Description"
+                key={field.id}
+                {...register(`description.${idx}`)}
+                placeholder={`Description point #${idx + 1}`}
               />
-            </CardContent>
+            ))}
+            <Button type="button" onClick={() => appendDescription("")}>
+              + Add Description Point
+            </Button>
           </Card>
 
           {/* INCLUDES */}

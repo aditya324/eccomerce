@@ -95,3 +95,20 @@ export const getCategoryBySlug = async (
     throw new Error("failed to fetch Categories by slug");
   }
 };
+
+
+export const getAllExcept = async (id:string): Promise<GetServicesResponse> => {
+  try {
+    const res = await axios.get<GetServicesResponse>(
+      `${BASEURL}/service/getAllExcept/${id}`
+    );
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Failed to fetch services");
+  }
+};
+
+
+
+
