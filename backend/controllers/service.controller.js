@@ -1,5 +1,6 @@
 import Category from "../models/category.model.js";
 import Service from "../models/service.model.js";
+import { razorpay } from "../utils/razorpay.js";
 
 export const AddService = async (req, res) => {
   const {
@@ -95,7 +96,6 @@ export const getService = async (req, res) => {
   }
 };
 
-
 export const getAllService = async (req, res) => {
   try {
     const service = await Service.find();
@@ -166,7 +166,6 @@ export const updateService = async (req, res) => {
       return res.status(404).json({ message: "Service not found." });
     }
 
-    
     if (slug && slug !== service.slug) {
       const slugExists = await Service.findOne({ slug });
       if (slugExists) {
@@ -217,5 +216,68 @@ export const getExceptService = async (req, res) => {
     res.status(200).json({ service });
   } catch (error) {
     res.status(500).json({ message: "Error fetching services", error });
+  }
+};
+
+export const createServicePackagePlan = async (req, res) => {
+  try {
+    const { serviceId, pkgId } = req.params;
+
+    console.log("serviceId:", req.params.serviceId);
+
+    console.log("pkgId:", req.params.pkgId);
+
+    const service = await Service.findById(serviceId);
+    if (!service) {
+      return res.status(404).json({ message: "Service not found" });
+    }
+
+    const pkg = service.packages.id(pkgId);
+    if (!pkg) {
+      return res
+        .status(404)
+        .json({ message: "Package not found in this service" });
+    }
+
+    if (pkg.planId) {
+      return res
+        .status(400)
+        .json({ message: "This package already has a Razorpay planId" });
+    }
+
+    const period = "monthly" // "monthly", "yearly", etc.
+    const interval = 1;
+    const amount = pkg.price * 100;
+    const name = `${service.title} — ${pkg.title}`;
+
+    const plan = await razorpay.plans.create({
+      period,
+      interval,
+      item: {
+        name,
+        amount,
+        currency: "INR",
+        description: `${service.title} / ${pkg.title} — ${period} subscription`,
+      },
+    });
+
+    console.log("Creating Razorpay plan with:");
+    console.log("  billingCycle:", pkg.billingCycle);
+    console.log("  price:", pkg.price);
+
+    pkg.planId = plan.id;
+    await service.save();
+
+    res.json({
+      message: "Razorpay plan created for service package",
+      planId: plan.id,
+      serviceId: service._id,
+      pkgId: pkg._id,
+    });
+  } catch (err) {
+    console.error("Error creating plan for service package:", err);
+    res
+      .status(500)
+      .json({ message: "Failed to create plan", error: err.message });
   }
 };

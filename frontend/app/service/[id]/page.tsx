@@ -5,8 +5,7 @@ import { useParams } from "next/navigation";
 import TrustedByLogos from "@/components/TrustedByLogos";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import { BASEURL } from "@/constants";
-import AllServiceExcept from '../../../components/AllServiceExcept';
-
+import AllServiceExcept from "../../../components/AllServiceExcept";
 
 import {
   Accordion,
@@ -14,6 +13,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import PricingCards from "@/components/PricingCards";
 
 interface Service {
   title: string;
@@ -21,7 +21,8 @@ interface Service {
   thumbnail: string;
   includes: string[];
   description: string[];
-  faqs:[],
+  faqs: [];
+  packages: [];
   rating: number;
   videoUrl: string;
 }
@@ -35,7 +36,7 @@ export default function ServiceDetails() {
     axios.get(`${BASEURL}/service/getServiceById/${id}`).then((res) => {
       setService(res.data);
 
-      console.log(res.data,"data")
+      console.log(res.data, "data");
     });
   }, [id]);
 
@@ -141,6 +142,9 @@ export default function ServiceDetails() {
           ></iframe>
         </div>
       </div>
+      <div className="p-10">
+        {service && <PricingCards packages={service.packages} serviceId={id} />}
+      </div>
 
       <div className="py-12">
         <h1 className="flex justify-center font-bold text-4xl text-[#333333] font-inter">
@@ -149,44 +153,46 @@ export default function ServiceDetails() {
         <TrustedByLogos />
       </div>
       <WhyChooseUs />
-     {/* Description Section: What We Will Do */}
-<div className="bg-gray-50 py-12 px-6 md:px-20">
-  <h2 className="text-[28px] leading-[36px] font-normal text-[#333333] font-[Quicksand] mb-6">
-    What We Will Do
-  </h2>
-  <ul className="list-disc pl-6 space-y-4">
-    {service.description.map((point, index) => (
-      <li
-        key={index}
-        className="text-[28px] leading-[36px] font-normal text-[#333333] font-[Quicksand]"
-      >
-        {point}
-      </li>
-    ))}
-  </ul>
-</div>
+      {/* Description Section: What We Will Do */}
+      <div className="bg-gray-50 py-12 px-6 md:px-20">
+        <h2 className="text-[28px] leading-[36px] font-normal text-[#333333] font-[Quicksand] mb-6">
+          What We Will Do
+        </h2>
+        <ul className="list-disc pl-6 space-y-4">
+          {service.description.map((point, index) => (
+            <li
+              key={index}
+              className="text-[28px] leading-[36px] font-normal text-[#333333] font-[Quicksand]"
+            >
+              {point}
+            </li>
+          ))}
+        </ul>
+      </div>
 
-<div className="bg-white py-20 px-6 md:px-20">
-  <h2 className="text-center text-[28px] leading-[36px] font-normal text-[#333333] font-[Quicksand] mb-10">
-    Frequently Asked Questions
-  </h2>
+      <div className="bg-white py-20 px-6 md:px-20">
+        <h2 className="text-center text-[28px] leading-[36px] font-normal text-[#333333] font-[Quicksand] mb-10">
+          Frequently Asked Questions
+        </h2>
 
-  <Accordion type="single" collapsible className="w-full max-w-3xl mx-auto">
-    {service.faqs.map((faq, index) => (
-      <AccordionItem value={`faq-${index}`} key={index}>
-        <AccordionTrigger className="text-left text-lg font-medium text-[#333333] font-[Quicksand]">
-          {faq.question}
-        </AccordionTrigger>
-        <AccordionContent className="text-base text-gray-600 font-[Quicksand]">
-          {faq.answer}
-        </AccordionContent>
-      </AccordionItem>
-    ))}
-  </Accordion>
-
- 
-</div>
- <AllServiceExcept id={id}/>
+        <Accordion
+          type="single"
+          collapsible
+          className="w-full max-w-3xl mx-auto"
+        >
+          {service.faqs.map((faq, index) => (
+            <AccordionItem value={`faq-${index}`} key={index}>
+              <AccordionTrigger className="text-left text-lg font-medium text-[#333333] font-[Quicksand]">
+                {faq.question}
+              </AccordionTrigger>
+              <AccordionContent className="text-base text-gray-600 font-[Quicksand]">
+                {faq.answer}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </div>
+      <AllServiceExcept id={id} />
     </div>
   );
 }

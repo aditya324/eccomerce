@@ -5,6 +5,7 @@ import { Providers } from "./providers";
 import { Toaster } from "sonner";
 import Navbar from "@/components/Navbar";
 import AppLayout from "@/components/AppLayout";
+import Script from "next/script";
 
 const quickSand = Quicksand({
   weight: ["300", "400", "600"],
@@ -34,6 +35,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Razorpay Checkout.js must be in the head before anything interactive */}
+        <Script
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="beforeInteractive"
+        
+        />
+      </head>
       <body className={`${quickSand.variable} ${popins.variable} antialiased`}>
         <Providers>
           <AppLayout>{children}</AppLayout>

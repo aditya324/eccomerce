@@ -4,7 +4,7 @@ const PackageSchema = new mongoose.Schema({
   price: Number,
   billingCycle: { type: String, default: "monthly" },
   features: [String],
-  planId: { type: String },
+  planId: { type: String,required: true },
 });
 
 const FAQSchema = new mongoose.Schema({

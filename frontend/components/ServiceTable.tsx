@@ -11,6 +11,16 @@ import {
 } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
+import CreateServicePlanButton from "@/components/CreateServicePlanButton";
+
+// Extend the Service type to include packages
+type Package = {
+  _id: string;
+  title: string;
+  price: number;
+  billingCycle: string;
+  planId?: string;
+};
 
 type Service = {
   _id: string;
@@ -20,12 +30,13 @@ type Service = {
   isFeatured: boolean;
   createdAt: string;
   slug: string;
+  packages: Package[];  // nested packages
 };
 
 export default function ServiceTable({ data }: { data: Service[] }) {
   const [globalFilter, setGlobalFilter] = useState("");
-  const [sorting, setSorting] = useState([]);
-  const [columnFilters, setColumnFilters] = useState([]);
+  const [sorting, setSorting] = useState<any[]>([]);
+  const [columnFilters, setColumnFilters] = useState<any[]>([]);
 
   const columns = useMemo<ColumnDef<Service>[]>(
     () => [
@@ -50,32 +61,44 @@ export default function ServiceTable({ data }: { data: Service[] }) {
       {
         header: "Created At",
         accessorKey: "createdAt",
-        cell: (info) =>
-          new Date(info.getValue() as string).toLocaleDateString(),
+        cell: (info) => new Date(info.getValue() as string).toLocaleDateString(),
       },
       {
-        header: "slug",
+        header: "Slug",
         accessorKey: "slug",
+      },
+      {
+        header: "Packages",
+        accessorKey: "packages",
+        cell: ({ row }) => (
+          <div className="space-y-2">
+            {row.original.packages.map((pkg) => (
+              <div key={pkg._id} className="flex items-center justify-between">
+                <div className="flex-1">
+                  <p className="font-medium">{pkg.title}</p>
+                  <p className="text-sm text-gray-600">
+                    ₹{pkg.price.toLocaleString()} / {pkg.billingCycle}
+                  </p>
+                </div>
+                <CreateServicePlanButton
+                  serviceId={row.original._id}
+                  pkgId={pkg._id}
+                />
+              </div>
+            ))}
+          </div>
+        ),
       },
       {
         header: "Actions",
         cell: ({ row }) => {
           const service = row.original;
-
           return (
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => console.log("Edit", service._id)}
-              >
+              <Button variant="outline" size="sm" onClick={() => console.log("Edit", service._id)}>
                 Edit
               </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => console.log("Delete", service._id)}
-              >
+              <Button variant="destructive" size="sm" onClick={() => console.log("Delete", service._id)}>
                 Delete
               </Button>
             </div>
@@ -124,10 +147,7 @@ export default function ServiceTable({ data }: { data: Service[] }) {
                   className="border px-4 py-2 text-left cursor-pointer select-none"
                   onClick={header.column.getToggleSortingHandler()}
                 >
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
+                  {flexRender(header.column.columnDef.header, header.getContext())}
                   {header.column.getIsSorted() === "asc" && " 🔼"}
                   {header.column.getIsSorted() === "desc" && " 🔽"}
                 </th>
@@ -158,8 +178,7 @@ export default function ServiceTable({ data }: { data: Service[] }) {
 
       <div className="flex items-center justify-between text-sm">
         <div>
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {table.getPageCount()}
+          Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
         </div>
         <div className="space-x-2">
           <button
