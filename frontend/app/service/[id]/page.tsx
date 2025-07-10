@@ -25,6 +25,7 @@ interface Service {
   packages: [];
   rating: number;
   videoUrl: string;
+  serviceId:string,
 }
 
 export default function ServiceDetails() {
@@ -54,7 +55,7 @@ export default function ServiceDetails() {
   return (
     <div>
       <div className="flex flex-col md:flex-row justify-center items-start gap-6 px-4 py-12 bg-white">
-        {/* Left: Thumbnail */}
+   
         <div
           className="rounded-lg shadow-lg overflow-hidden"
           style={{ width: "666px", height: "488px", opacity: 1 }}
@@ -66,7 +67,7 @@ export default function ServiceDetails() {
           />
         </div>
 
-        {/* Middle: Info Card */}
+
         <div
           className="border-2 border-yellow-400 rounded-lg p-6 shadow-md flex flex-col justify-between"
           style={{ width: "344px", height: "492px" }}
@@ -103,7 +104,7 @@ export default function ServiceDetails() {
           </div>
         </div>
 
-        {/* Right: Includes Card */}
+  
         <div
           className="bg-white border border-gray-300 rounded-lg p-6 shadow-sm"
           style={{ width: "344px", height: "492px" }}
@@ -116,10 +117,9 @@ export default function ServiceDetails() {
           </ul>
         </div>
 
-        {/* Video Section */}
       </div>
 
-      {/* Video Section */}
+
       <div className="flex justify-center mt-20">
         <div
           className="rounded-lg overflow-hidden shadow-lg"
@@ -143,17 +143,16 @@ export default function ServiceDetails() {
         </div>
       </div>
       <div className="p-10">
-        {service && <PricingCards packages={service.packages} serviceId={id} />}
+        {service && <PricingCards packages={service.packages} serviceId={id as string} />}
       </div>
 
       <div className="py-12">
         <h1 className="flex justify-center font-bold text-4xl text-[#333333] font-inter">
           Trusted by 600+ clients
-        </h1>
+        </h1> 
         <TrustedByLogos />
       </div>
       <WhyChooseUs />
-      {/* Description Section: What We Will Do */}
       <div className="bg-gray-50 py-12 px-6 md:px-20">
         <h2 className="text-[28px] leading-[36px] font-normal text-[#333333] font-[Quicksand] mb-6">
           What We Will Do
@@ -180,7 +179,7 @@ export default function ServiceDetails() {
           collapsible
           className="w-full max-w-3xl mx-auto"
         >
-          {service.faqs.map((faq, index) => (
+          {service.faqs.map((faq:{ question: string; answer: string }, index) => (
             <AccordionItem value={`faq-${index}`} key={index}>
               <AccordionTrigger className="text-left text-lg font-medium text-[#333333] font-[Quicksand]">
                 {faq.question}
@@ -192,7 +191,7 @@ export default function ServiceDetails() {
           ))}
         </Accordion>
       </div>
-      <AllServiceExcept id={id} />
+      <AllServiceExcept id={id as string} />
     </div>
   );
 }

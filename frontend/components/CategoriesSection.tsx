@@ -5,6 +5,7 @@ import { useCategoryServices } from "@/hooks/useCategoryServices";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
+import { Service } from "@/types/service";
 
 export default function CategoriesSection() {
   const { data, isLoading, error } = useCategories();
@@ -57,7 +58,7 @@ export default function CategoriesSection() {
                   </p>
                 ) : (
                   <div className="space-y-2">
-                    {services.map((s: any) => (
+                    {services.map((s: Service) => (
                       <Link
                         href={`/service/${s._id}`}
                         key={s._id}

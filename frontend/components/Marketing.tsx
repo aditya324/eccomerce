@@ -6,13 +6,16 @@ import Slider from "react-slick";
 import { useCategoryBySlug } from "@/hooks/useCategories";
 
 export default function DevelopMent() {
-  const { data, isLoading, isError } = useCategoryBySlug("test-category");
+  const {
+    data,
+    isLoading,
+    isError: error,
+  } = useCategoryBySlug("test-category");
 
   console.log("data", data);
 
   if (isLoading) return <div className="px-6 py-8">Loading...</div>;
-  if (isError || !data || !data.services)
-    return <div className="px-6 py-8">Failed to load services.</div>;
+  if (error) return <p>Error loading category</p>;
 
   const settings = {
     dots: false,

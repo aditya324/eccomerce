@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Quicksand, Poppins } from "next/font/google";
+import { Quicksand, Poppins } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "sonner";
-import Navbar from "@/components/Navbar";
+
 import AppLayout from "@/components/AppLayout";
 import Script from "next/script";
 
