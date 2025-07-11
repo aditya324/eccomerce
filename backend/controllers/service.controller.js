@@ -173,7 +173,7 @@ export const updateService = async (req, res) => {
       }
     }
 
-    // Update fields if provided
+    
     if (title) service.title = title;
     if (slug) service.slug = slug;
     if (categoryId) {

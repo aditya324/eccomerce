@@ -12,6 +12,7 @@ import {
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import CreateServicePlanButton from "@/components/CreateServicePlanButton";
+import { useRouter } from "next/navigation";
 
 // Extend the Service type to include packages
 type Package = {
@@ -37,6 +38,8 @@ export default function ServiceTable({ data }: { data: Service[] }) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState<any[]>([]);
   const [columnFilters, setColumnFilters] = useState<any[]>([]);
+
+  const router=useRouter()
 
   const columns = useMemo<ColumnDef<Service>[]>(
     () => [
@@ -95,7 +98,7 @@ export default function ServiceTable({ data }: { data: Service[] }) {
           const service = row.original;
           return (
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => console.log("Edit", service._id)}>
+              <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/update/${service._id}`)}>
                 Edit
               </Button>
               <Button variant="destructive" size="sm" onClick={() => console.log("Delete", service._id)}>

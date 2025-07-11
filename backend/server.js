@@ -12,14 +12,15 @@ import path from "path";
 
 import cookieParser from "cookie-parser";
 
+import cartRoutes from "./routes/cart.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
+import packageRoutes from "./routes/package.routes.js";
+import paymentRoutes from "./routes/payment.routes.js";
 import serviceRoutes from "./routes/service.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import connectDB from "./utils/db.js";
-import cartRoutes from "./routes/cart.routes.js"
-import packageRoutes from "./routes/package.routes.js"
 dotenv.config();
-
+import subscriptionRoutes from "./routes/subscriptions.route.js"
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -27,10 +28,12 @@ const PORT = process.env.PORT || 4000;
 connectDB();
 
 // Middlewares
-app.use(cors({
-  origin: ["http://localhost:3001","http://localhost:3000"], // your frontend port
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: ["http://localhost:3001", "http://localhost:3000"], // your frontend port
+    credentials: true,
+  })
+);
 app.use(cookieParser());
 app.use(express.json());
 
@@ -64,17 +67,18 @@ app.get("/", (req, res) => {
   res.send("🚀 Backend is running");
 });
 
-
-app.get('/api/test-cookies', (req, res) => {
-  console.log('Cookies:', req.cookies);
+app.get("/api/test-cookies", (req, res) => {
+  console.log("Cookies:", req.cookies);
   res.json({ cookies: req.cookies });
 });
 
 app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
-app.use("/api/service",serviceRoutes)
-app.use("/api/cart",cartRoutes)
-app.use("/api/package",packageRoutes)
+app.use("/api/service", serviceRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/package", packageRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/subscription",subscriptionRoutes)
 
 // Start server
 app.listen(PORT, () => {

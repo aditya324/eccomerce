@@ -5,6 +5,8 @@ import axios from 'axios'
 import PlanCards from './PlanCards'
 import { BASEURL } from '@/constants'
 
+
+
 const categories = [
   { slug: 'test-category', label: 'Social Media Management' },
   { slug: 'test-category2',      label: 'SEO (Local & On-Page)'    },
@@ -18,7 +20,7 @@ export default function PackageTabs() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    // if we haven't fetched this category yet, do it
+
     if (!plansByCat[active]) {
       setLoading(true)
       axios
@@ -59,7 +61,6 @@ export default function PackageTabs() {
           <PlanCards
             plans={plansByCat[active] || []}
             onSelectPlan={plan => {
-              /* your razorpay or signup logic here */
               console.log('selected plan', plan)
             }}
           />

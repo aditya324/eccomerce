@@ -10,7 +10,7 @@ export default function PlanCards({ plans, onSelectPlan }) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {plans.map((plan, idx) => {
+      {plans.map((plan:string[], idx:number) => {
         // Choose styling based on index
         const isBasic = idx === 1;
         const baseClasses =
@@ -64,7 +64,7 @@ export default function PlanCards({ plans, onSelectPlan }) {
 
             {/* Features */}
             <ul className="flex-1 space-y-3 mb-6">
-              {plan.features.map((feat, i) => (
+              {plan.features.map((feat:string[], i:string) => (
                 <li key={i} className="flex items-start">
                   <svg
                     className="w-5 h-5 text-green-500 flex-shrink-0 mt-1 mr-2"

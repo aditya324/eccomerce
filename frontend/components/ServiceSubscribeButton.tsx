@@ -4,21 +4,31 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { BASEURL } from "@/constants";
+import { toast } from "sonner";
 
 interface Props {
   serviceId: string;
-  pkgId:     string;
-  label:     string;
+  pkgId: string;
+  label: string;
 }
 
-export default function ServiceSubscribeButton({ serviceId, pkgId, label }: Props) {
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
+export default function ServiceSubscribeButton({
+  serviceId,
+  pkgId,
+  label,
+}: Props) {
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+
 
   const handleSubscribe = async () => {
     setLoading(true);
     try {
-      // 1) Create subscription on backend
       const { data } = await axios.post(
         `${BASEURL}/service/${serviceId}/packages/${pkgId}/subscribe`,
         {},
@@ -26,23 +36,51 @@ export default function ServiceSubscribeButton({ serviceId, pkgId, label }: Prop
       );
       const { subscriptionId, razorpayKey } = data;
 
-      // 2) Launch Razorpay checkout
       const options = {
-        key:             razorpayKey,
+        key: razorpayKey,
         subscription_id: subscriptionId,
-        name:            label,
-        description:     "Recurring subscription",
-        handler(response: any) {
-         console.log(response,"response")
-        //   router.push("/dashboard/subscriptions");
+        name: label,
+        description: "Recurring subscription",
+        handler: async (response: {
+          razorpay_payment_id: string;
+          razorpay_subscription_id: string;
+          razorpay_signature: string;
+        }) => {
+          console.log("Razorpay response:", response);
+          try {
+            await axios.post(
+              `${BASEURL}/payments/verify`,
+              {
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_subscription_id: response.razorpay_subscription_id,
+                razorpay_signature: response.razorpay_signature,
+              },
+              { withCredentials: true }
+            );
+
+            toast.success("payment successfull");
+          } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+              console.error("Axios error:", err.response?.data);
+            } else if (err instanceof Error) {
+              console.error(err.message);
+            } else {
+              console.error("Unknown error", err);
+            }
+          }
         },
         theme: { color: "#FBBF24" },
       };
-      
+
       new window.Razorpay(options).open();
-    } catch (err: any) {
-      console.error("Subscription error:", err);
-      alert(err.response?.data?.message || "Subscription failed");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        console.error("Axios error:", err.response?.data);
+      } else if (err instanceof Error) {
+        console.error(err.message);
+      } else {
+        console.error("Unknown error", err);
+      }
     } finally {
       setLoading(false);
     }

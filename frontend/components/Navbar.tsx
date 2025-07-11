@@ -14,31 +14,34 @@ import {
   User,
 } from "lucide-react";
 import { BASEURL } from "@/constants";
+import { Service } from "@/types/service";
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState<Service[]>([]);
    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 
     useEffect(() => {
     const checkLogin = async () => {
       try {
-        const res = await axios.get(`${BASEURL}/users/check`, {
-          withCredentials: true, // ✅ send cookies
+        const res = await axios.get<{ isLoggedIn: boolean }>(`${BASEURL}/users/check`, {
+          withCredentials: true,
         });
         setIsLoggedIn(res.data.isLoggedIn);
         console.log(res)
       } catch (error) {
-        setIsLoggedIn(false); // fallback
+          console.error("Error checking login status", error);
+        setIsLoggedIn(false); 
+        
       }
     };
 
     checkLogin();
   }, []);
 
-  // Debounced search function
+
   const debouncedSearch = useCallback(
     debounce(async (searchTerm: string) => {
       if (!searchTerm.trim()) {
@@ -57,7 +60,6 @@ export default function Navbar() {
     []
   );
 
-  // Trigger debounced search
   useEffect(() => {
     debouncedSearch(query);
     return () => debouncedSearch.cancel();
@@ -66,12 +68,12 @@ export default function Navbar() {
   return (
     <nav className="w-full bg-white z-50 relative">
       <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between">
-        {/* Logo */}
+
         <Link href="/" className="flex items-center space-x-2">
           <Image src="/sunrise-logo.png" alt="Logo" width={40} height={40} />
         </Link>
 
-        {/* Desktop Search Bar */}
+     
         <div className="hidden lg:flex flex-col flex-1 mx-8 max-w-3xl relative">
           <div className="flex w-full rounded border border-gray-300 overflow-hidden">
             <input
@@ -89,7 +91,7 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* Desktop Search Results */}
+ 
           {results.length > 0 && (
             <div className="absolute top-full mt-2 bg-white border rounded shadow w-full z-50 max-h-64 overflow-y-auto">
               {results.map((service) => (
@@ -113,7 +115,6 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Desktop Icons */}
        <div className="hidden lg:flex items-center space-x-6 text-gray-700">
   {isLoggedIn ? (
     <>
@@ -137,7 +138,7 @@ export default function Navbar() {
 </div>
 
 
-        {/* Hamburger */}
+
         <button
           className="lg:hidden text-gray-700"
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -146,7 +147,7 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Menu */}
+
       {mobileOpen && (
         <div className="lg:hidden px-4 pb-4 space-y-4">
           <div className="flex flex-col relative">
@@ -166,13 +167,12 @@ export default function Navbar() {
               </button>
             </div>
 
-            {/* Mobile Search Results */}
             {results.length > 0 && (
               <div className="mt-2 bg-white border rounded shadow w-full z-50 max-h-64 overflow-y-auto">
                 {results.map((service) => (
                   <Link
-                    key={service._id}
-                    href={`/services/${service.slug}`}
+                   key={service._id}
+                  href={`/service/${service._id}`}
                     className="flex items-center gap-4 px-4 py-2 hover:bg-gray-100"
                   >
                     <Image

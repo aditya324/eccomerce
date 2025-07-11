@@ -1,11 +1,14 @@
 import mongoose from "mongoose";
 
 const SubscriptionSchema = new mongoose.Schema({
-  subscriptionId:     String,   
-  packageId:          { type: mongoose.Schema.Types.ObjectId, ref: "Package" },
-  status:             String, 
-  currentStart:       Date,
-  currentEnd:         Date,
+  subscriptionId:    String,
+  packageId:         { type: mongoose.Schema.Types.ObjectId, ref: "Package" },
+  status:            String,
+  currentStart:      Date,
+  currentEnd:        Date,
+  paymentId:         String,
+  paymentStatus:     String,
+  paymentSignature:  String,
 }, { _id: false });
 
 const UserSchema = new mongoose.Schema(

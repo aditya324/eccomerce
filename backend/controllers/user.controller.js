@@ -32,10 +32,10 @@ export const registerUser = async (req, res) => {
       role,
     });
 
-    // 1. Generate token
+
     const token = generateToken(user._id);
 
-    // 2. (Optional) Set cookie
+
     res.cookie("jwt", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -43,7 +43,7 @@ export const registerUser = async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
-    // 3. Send response
+ 
     res.status(201).json({
       _id: user._id,
       name: user.name,
@@ -75,10 +75,10 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // 1. Generate token
+   
     const token = generateToken(user._id);
 
-    // 2. (Optional) Set cookie
+ 
     res.cookie("jwt", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -86,7 +86,7 @@ export const loginUser = async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
-    // 3. Send response
+ 
     res.json({
       _id: user._id,
       name: user.name,
