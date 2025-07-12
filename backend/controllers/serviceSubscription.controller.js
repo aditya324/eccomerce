@@ -65,52 +65,56 @@ export const createServiceSubscription = async (req, res) => {
 
 export const getMySubscriptions = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id)
-      .select("subscriptions")
-      .populate({
-        path: "subscriptions.packageId",
-        populate: {
-          path:   "serviceIds",
-          model:  "Service",
-          select: "title slug thumbnail",
-        },
-      });
-
+    const user = await User.findById(req.user._id).select("subscriptions");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const detailed = user.subscriptions.map((sub) => {
-      const pkg      = sub.packageId;
-      const services = Array.isArray(pkg?.serviceIds)
-        ? pkg.serviceIds
-        : [];
+    const detailed = await Promise.all(
+      user.subscriptions.map(async (sub) => {
+        const service = await Service.findOne(
+          { "packages._id": sub.packageId },
+          {
+            title: 1,
+            slug: 1,
+            thumbnail: 1,
+       
+            "packages.$": 1,
+          }
+        );
+        if (!service) {
+      
+          return null;
+        }
 
-      return {
-        subscriptionId: sub.subscriptionId,
-        status:         sub.status,
-        currentStart:   sub.currentStart,
-        currentEnd:     sub.currentEnd,
-        paymentId:      sub.paymentId,
-        paymentStatus:  sub.paymentStatus,
+        const pkg = service.packages[0];
+        return {
+          subscriptionId: sub.subscriptionId,
+          status:         sub.status,
+          currentStart:   sub.currentStart,
+          currentEnd:     sub.currentEnd,
+          paymentId:      sub.paymentId,
+          paymentStatus:  sub.paymentStatus,
 
-        package: {
-          id:           pkg._id,
-          title:        pkg.title,
-          price:        pkg.price,
-          billingCycle: pkg.billingCycle,
-        },
+          service: {
+            id:        service._id,
+            title:     service.title,
+            slug:      service.slug,
+            thumbnail: service.thumbnail,
+          },
 
-        services: services.map((s) => ({
-          id:        s._id,
-          title:     s.title,
-          slug:      s.slug,
-          thumbnail: s.thumbnail,
-        })),
-      };
-    });
+          package: {
+            id:           pkg._id,
+            title:        pkg.title,
+            price:        pkg.price,
+            billingCycle: pkg.billingCycle,
+          },
+        };
+      })
+    );
 
-    res.json(detailed);
+   
+    res.json(detailed.filter(Boolean));
   } catch (err) {
     console.error("getMySubscriptions error:", err);
     res
@@ -118,3 +122,8 @@ export const getMySubscriptions = async (req, res) => {
       .json({ message: "Failed to fetch subscriptions", error: err.message });
   }
 };
+
+
+
+
+
