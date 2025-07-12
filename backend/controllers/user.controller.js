@@ -5,8 +5,13 @@ import jwt from "jsonwebtoken";
 
 import dotenv from "dotenv";
 
+import { randomBytes, createHmac } from "crypto";
+
+import nodemailer from "nodemailer";
+
 import User from "../models/user.model.js";
 import { client } from "../utils/googleClient.js";
+
 dotenv.config();
 
 
@@ -185,3 +190,109 @@ export const checkAuth = (req, res) => {
     return res.status(401).json({ isLoggedIn: false });
   }
 };
+
+
+export const logoutUser = (req, res) => {
+
+  res.cookie("jwt", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    expires: new Date(0),
+  });
+  res.json({ message: "Logged out successfully" });
+};
+
+
+
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  try {
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "No account with that email" });
+
+
+    const token = randomBytes(20).toString("hex");          
+    user.resetPasswordToken   = token;
+    user.resetPasswordExpires = Date.now() + 3600000; 
+    await user.save();
+
+   
+    const transporter = nodemailer.createTransport({
+      host:   process.env.GODADDY_SMTP_HOST,
+      port:   Number(process.env.GODADDY_SMTP_PORT) || 465,
+      secure: true,
+      auth: {
+        user: process.env.GODADDY_SMTP_USER,
+        pass: process.env.GODADDY_SMTP_PASS,
+      },
+    });
+
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+      await transporter.sendMail({
+      from:    process.env.SMTP_FROM,
+      to:      user.email,
+      subject: "🔒 Reset Your Password",
+      text:    `Reset link: ${resetUrl}`,
+      html: `
+        <div style="font-family:Arial,sans-serif;line-height:1.6;color:#333;padding:20px;">
+          <h1 style="color:#444;">Password Reset Requested</h1>
+          <p>Hi ${user.name || ""},</p>
+          <p>You recently requested to reset your password. Click the button below to choose a new one:</p>
+          <p style="text-align:center;margin:30px 0;">
+            <a
+              href="${resetUrl}"
+              style="
+                background-color:#D68910;
+                color:#fff;
+                padding:12px 24px;
+                text-decoration:none;
+                border-radius:4px;
+                font-size:16px;
+              "
+            >Reset Password</a>
+          </p>
+          
+          <hr style="border:none;border-top:1px solid #eee;margin:30px 0;" />
+          <p style="font-size:12px;color:#888;">
+            If you did not request this, you can safely ignore this email. This link expires in 1 hour.
+          </p>
+        </div>
+      `,
+    });
+
+    res.json({ message: `Reset email sent to ${user.email}` });
+  } catch (err) {
+    console.error("forgotPassword error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
+export const resetPassword = async (req, res) => {
+  const { token }         = req.params;
+  const { password }      = req.body;
+  try {
+
+    const user = await User.findOne({
+      resetPasswordToken:   token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+    if (!user) {
+      return res.status(400).json({ message: "Token invalid or expired" });
+    }
+
+
+    user.password             = await bcrypt.hash(password, 10);
+    user.resetPasswordToken   = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.json({ message: "Password has been reset" });
+  } catch (err) {
+    console.error("resetPassword error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+}
