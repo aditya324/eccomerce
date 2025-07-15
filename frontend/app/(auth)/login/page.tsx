@@ -19,7 +19,7 @@ export default function LoginPage() {
 
   const login = useLogin();
 
-  const router=useRouter()
+  const router = useRouter();
 
   const googleLogin = useGoogleLogin();
 
@@ -30,25 +30,25 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     login.mutate(form, {
-  onSuccess: (data: any) => {
-    toast.success("account logged in successfully");
-    console.log(data, "login data")
-    if (data?.user?.role === "admin" || data?.role === "admin") {
-      router.push("/dashboard");
-    } else {
-      router.push("/"); // or wherever users go
-    }
+      onSuccess: (data: any) => {
+        toast.success("account logged in successfully");
+        console.log(data, "login data");
+        if (data?.user?.role === "admin" || data?.role === "admin") {
+          router.push("/dashboard");
+        } else {
+          router.push("/"); // or wherever users go
+        }
 
-    setForm({ email: "", password: "" });
-  },
-  onError: (err: unknown) => {
-    if (err instanceof Error) {
-      toast.error(err.message);
-    } else {
-      toast.error("Login failed");
-    }
-  },
-});
+        setForm({ email: "", password: "" });
+      },
+      onError: (err: unknown) => {
+        if (err instanceof Error) {
+          toast.error(err.message);
+        } else {
+          toast.error("Login failed");
+        }
+      },
+    });
   };
 
   return (
@@ -130,7 +130,6 @@ export default function LoginPage() {
                     onSuccess: (data) => {
                       toast.success("Login successful!");
                       console.log("User:", data);
-                      // router.push("/dashboard"); // or store in context/localStorage
                     },
                     onError: (err: any) => {
                       toast.error(
@@ -142,6 +141,13 @@ export default function LoginPage() {
               }}
               onError={() => toast.error("Google login failed")}
             />
+
+            <p
+              className="text-sm text-gray-600 text-center mt-4 cursor-pointer "
+              onClick={() => router.push("/forgot-password")}
+            >
+              forgotpassword?
+            </p>
 
             {/* Login Link */}
             <p className="text-sm text-gray-600 text-center mt-4">

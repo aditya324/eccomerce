@@ -15,4 +15,7 @@ router.post("/reset-password/:token", resetPassword);
 router.get('/:id', protect, getUserById);
 
 
+
+
+
 export default router;

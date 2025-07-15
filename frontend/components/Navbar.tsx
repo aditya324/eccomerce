@@ -134,7 +134,12 @@ export default function Navbar() {
         <div className="hidden lg:flex items-center space-x-6 text-gray-700">
           {isLoggedIn ? (
             <>
-              <Heart className="w-6 h-6 cursor-pointer hover:text-yellow-500" />
+              <Heart
+                className="w-6 h-6 cursor-pointer hover:text-yellow-500"
+                onClick={() => {
+                  router.push(`/wishlist`);
+                }}
+              />
               <div className="relative cursor-pointer hover:text-yellow-500">
                 <ShoppingCart className="w-6 h-6" />
                 <span className="absolute -top-2 -right-2 text-xs bg-yellow-500 text-white rounded-full w-5 h-5 flex items-center justify-center">

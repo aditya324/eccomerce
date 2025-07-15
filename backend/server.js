@@ -18,6 +18,7 @@ import packageRoutes from "./routes/package.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import serviceRoutes from "./routes/service.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import wishlistRoutes from "./routes/wishlist.routes.js";
 import connectDB from "./utils/db.js";
 dotenv.config();
 import subscriptionRoutes from "./routes/subscriptions.route.js"
@@ -79,7 +80,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/package", packageRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/subscription",subscriptionRoutes)
-
+app.use("/api/wishlist",wishlistRoutes)
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);

@@ -25,6 +25,9 @@ const UserSchema = new mongoose.Schema(
     subscriptions: [SubscriptionSchema],
     resetPasswordToken: String,
     resetPasswordExpires: Date,
+    wishlist: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "Service" }
+  ],
     billingDetails: {
       firstName: String,
       companyName: String,

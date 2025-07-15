@@ -14,6 +14,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import PricingCards from "@/components/PricingCards";
+import ServiceWishlistButton from "@/components/ServiceWishlistButton";
 
 interface Service {
   title: string;
@@ -78,10 +79,12 @@ export default function ServiceDetails() {
             <p className="text-2xl font-semibold text-orange-600">
               ₹{service.price}
             </p>
+            <ServiceWishlistButton serviceId={id as string}/>
 
             <button className="bg-yellow-400 hover:bg-yellow-500 transition text-white w-full py-2 rounded font-semibold">
               Add to cart
             </button>
+            
 
             <div className="text-sm text-gray-700">
               <p>
