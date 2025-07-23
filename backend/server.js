@@ -16,6 +16,7 @@ import cartRoutes from "./routes/cart.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
 import packageRoutes from "./routes/package.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
+import s3Routes from "./routes/s3Routes.js";
 import serviceRoutes from "./routes/service.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import wishlistRoutes from "./routes/wishlist.routes.js";
@@ -81,6 +82,7 @@ app.use("/api/package", packageRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/subscription",subscriptionRoutes)
 app.use("/api/wishlist",wishlistRoutes)
+app.use('/api/s3', s3Routes); 
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);

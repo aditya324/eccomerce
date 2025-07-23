@@ -48,7 +48,7 @@ export const createPackage = async (req, res) => {
       features,
       category,
       isFeatured,
-      planId, // ✅ store Razorpay planId
+      planId, 
     });
 
     const saved = await newPackage.save();
