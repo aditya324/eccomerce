@@ -118,12 +118,12 @@ export default function AddPackagePage() {
           </CardContent>
         </Card>
 
-        <Card>
+        {/* <Card>
           <CardContent className="p-4 space-y-2">
             <Label>Plan ID</Label>
             <Input {...register('planId')} placeholder="e.g. basic-001" />
           </CardContent>
-        </Card>
+        </Card> */}
 
         <Card>
           <CardContent className="p-4 space-y-2">

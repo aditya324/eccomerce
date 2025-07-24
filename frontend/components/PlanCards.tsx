@@ -1,6 +1,7 @@
 // components/PlanCards.jsx
 "use client";
 import React, { useState } from "react";
+import SubscribeButton from "./SubscribeButton";
 
 export default function PlanCards({ plans, onSelectPlan }) {
   const [yearlyMap, setYearlyMap] = useState<{ [key: string]: boolean }>({});
@@ -23,7 +24,7 @@ export default function PlanCards({ plans, onSelectPlan }) {
           <div key={plan._id} className={`${baseClasses} ${styleClasses}`}>
             {/* Yearly Toggle */}
             <div className="absolute top-4 right-4 flex items-center space-x-1">
-              <span className="text-sm text-gray-500">Yearly</span>
+              {/* <span className="text-sm text-gray-500">Yearly</span>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
                   type="checkbox"
@@ -39,7 +40,7 @@ export default function PlanCards({ plans, onSelectPlan }) {
 
                 <div className="w-9 h-5 bg-gray-200 peer-focus:ring-4 peer-focus:ring-yellow-300 rounded-full peer peer-checked:bg-yellow-500 transition-colors"></div>
                 <div className="absolute left-0.5 top-0.5 bg-white w-4 h-4 rounded-full peer-checked:translate-x-4 transition-transform shadow"></div>
-              </label>
+              </label> */}
             </div>
 
             {/* Title */}
@@ -85,20 +86,7 @@ export default function PlanCards({ plans, onSelectPlan }) {
             </ul>
 
             {/* CTA */}
-            <button
-              onClick={() =>
-                onSelectPlan({
-                  ...plan,
-                  billingCycle: yearlyMap[plan._id]
-                    ? "yearly"
-                    : plan.billingCycle,
-                  price: yearlyMap[plan._id] ? plan.price * 12 : plan.price,
-                })
-              }
-              className="mt-auto bg-yellow-500 text-white py-3 rounded-lg hover:bg-yellow-600 transition-colors text-center"
-            >
-              Get a plan
-            </button>
+            <SubscribeButton packageId={plan._id} />
           </div>
         );
       })}

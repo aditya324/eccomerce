@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { BASEURL } from "@/constants";
 import { toast } from "sonner";
+import { RazorpayInstance, RazorpayOptions } from "@/types/razorpay";
 
 interface Props {
   serviceId: string;
@@ -14,8 +15,8 @@ interface Props {
 
 declare global {
   interface Window {
-    Razorpay: any;
-  }
+  Razorpay: new (options: RazorpayOptions) => RazorpayInstance;
+}
 }
 
 export default function ServiceSubscribeButton({
