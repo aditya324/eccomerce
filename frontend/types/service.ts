@@ -36,3 +36,28 @@ export interface GetServicesResponse {
   message: string;
   service: Service[];
 }
+
+
+
+interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+  icon: string;
+  createdAt: string; // Or Date
+  [key: string]: any;
+}
+
+// NOTE: The structure for this is still a sample.
+// Adjust it to match your actual data.
+interface ServiceItem {
+  _id: string;
+  name: string;
+  description: string;
+  // ... other properties
+}
+
+interface CategoryWithServices {
+  data: Category;
+  services: ServiceItem[];
+}

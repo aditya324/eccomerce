@@ -18,11 +18,11 @@ export default function SubscribeButton({ packageId }: { packageId: string }) {
         { withCredentials: true }
       );
 
-      const { razorpaySubscriptionId,  packageTitle } = res.data;
+      const { razorpaySubscriptionId, customerId, packageTitle } = res.data;
 
       console.log("res.data", res.data);
 
-
+      // 2. Open Razorpay Checkout
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         name: "Sunrise Digital",
@@ -58,7 +58,7 @@ export default function SubscribeButton({ packageId }: { packageId: string }) {
         },
       };
 
-      const razorpay = new window.Razorpay(options);
+      const razorpay = new (window as any).Razorpay(options);
       razorpay.open();
     } catch (err: any) {
       alert(err?.response?.data?.message || "Failed to subscribe");
