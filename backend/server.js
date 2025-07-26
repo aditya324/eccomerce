@@ -14,6 +14,7 @@ import cookieParser from "cookie-parser";
 
 import cartRoutes from "./routes/cart.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
+import oohServiceRoutes from "./routes/oohService.routes.js";
 import packageRoutes from "./routes/package.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import s3Routes from "./routes/s3Routes.js";
@@ -83,6 +84,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/subscription",subscriptionRoutes)
 app.use("/api/wishlist",wishlistRoutes)
 app.use('/api/s3', s3Routes); 
+app.use("/api/oohservices", oohServiceRoutes);
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
