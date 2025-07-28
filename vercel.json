@@ -1,23 +1,23 @@
-{
-  "version": 2,
-  "builds": [
     {
-      "src": "backend/server.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "frontend/next.config.ts",
-      "use": "@vercel/next"
+    "version": 2,
+    "builds": [
+        {
+        "src": "backend/server.js",
+        "use": "@vercel/node"
+        },
+        {
+        "src": "frontend/next.config.ts",
+        "use": "@vercel/next"
+        }
+    ],
+    "rewrites": [
+        {
+        "source": "/api/(.*)",
+        "destination": "/backend/server.js"
+        },
+        {
+        "source": "/(.*)",
+        "destination": "/frontend"
+        }
+    ]
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/backend/server.js"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/frontend"
-    }
-  ]
-}

@@ -2,7 +2,7 @@
 
 import { useServiceExcept } from "@/hooks/useService";
 import { Service } from "@/types/service";
-import ServiceCard from "@/components/ServiceCard";
+import ServiceCard from "./serviceCard";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
