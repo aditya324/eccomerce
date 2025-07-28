@@ -3,7 +3,7 @@
 import { useCategories } from '@/hooks/useCategories';
 import CategoryTable from '@/components/CategoryTable';
 import { Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+
 
 export default function CategoryPage() {
   const { data, isLoading, isError } = useCategories();
