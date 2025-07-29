@@ -11,7 +11,9 @@ import { useRouter } from "next/navigation";
 import { BASEURL } from "@/constants";
 
 interface ForgotPasswordResponse {
-  message: string;
+  data:{
+    message: string;
+  }
 }
 
 const ForgotPasswordPage = () => {
