@@ -6,6 +6,7 @@ import { Toaster } from "sonner";
 
 import AppLayout from "@/components/AppLayout";
 import Script from "next/script";
+import { AuthProvider } from "./authProviders";
 
 const quickSand = Quicksand({
   weight: ["300", "400", "600"],
@@ -44,10 +45,12 @@ export default function RootLayout({
         />
       </head>
       <body className={`${quickSand.variable} ${popins.variable} antialiased`}>
-        <Providers>
+        <AuthProvider>
+          <Providers>
           <AppLayout>{children}</AppLayout>
           <Toaster position="top-right" />
         </Providers>
+        </AuthProvider>
       </body>
     </html>
   );

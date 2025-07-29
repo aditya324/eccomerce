@@ -173,22 +173,31 @@ export const googleAuth = async (req, res) => {
 
 
 // backend/controllers/auth.controller.js
-export const checkAuth = (req, res) => {
+export const checkAuth = async (req, res) => {
   try {
     const token = req.cookies.jwt;
     console.log("token check", token);
 
     if (!token) {
-      return res.status(401).json({ isLoggedIn: false });
+      return res.status(401).json({ isLoggedIn: false, error: "No token provided" });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("decoded payload", decoded);
+    
+ 
+    const user = await User.findById(decoded?.id).select('-password'); // Exclude password from response
 
-    return res.status(200).json({ isLoggedIn: true });
+    
+    if (!user) {
+        return res.status(404).json({ isLoggedIn: false, error: "User not found" });
+    }
+
+    return res.status(200).json({ isLoggedIn: true, user: user });
+
   } catch (err) {
+    // This block is likely being triggered by an expired token or mismatched secret
     console.error("JWT verification failed:", err.message);
-    return res.status(401).json({ isLoggedIn: false });
+    return res.status(401).json({ isLoggedIn: false, error: err.message });
   }
 };
 
