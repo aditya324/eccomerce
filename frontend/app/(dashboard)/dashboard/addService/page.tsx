@@ -98,7 +98,7 @@ const uploadFile = async (file: File): Promise<string> => {
   }
 };
 
-// --- React Component ---
+
 export default function AddServicePage() {
   const [categories, setCategories] = useState<{ _id: string; name: string }[]>(
     []

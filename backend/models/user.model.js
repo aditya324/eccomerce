@@ -4,15 +4,38 @@ const SubscriptionSchema = new mongoose.Schema(
   {
     subscriptionId: String,
     packageId: { type: mongoose.Schema.Types.ObjectId, ref: "Package" },
-    status: String,
+    status: {
+      type: String,
+      enum: ["created", "active", "cancelled", "expired"],
+      default: "created",
+    },
     currentStart: Date,
     currentEnd: Date,
     paymentId: String,
-    paymentStatus: String,
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "paid", "failed","captured"],
+      default: "pending",
+    },
     paymentSignature: String,
+
+   
+    nextBillingDate: Date,
+    renewalLogs: [
+      {
+        paymentId: String,
+        date: Date,
+        amount: Number,
+        status: {
+          type: String,
+          enum: ["paid", "failed"],
+        },
+      },
+    ],
   },
   { _id: false }
 );
+
 
 const PackageSubscriptionSchema = new mongoose.Schema(
   {
@@ -31,14 +54,30 @@ const PackageSubscriptionSchema = new mongoose.Schema(
     currentEnd: Date,
     paymentId: String,
     paymentStatus: {
-      type: String,
-      enum: ["pending", "paid", "failed"],
-      default: "pending",
-    },
+  type: String,
+  enum: ["pending", "paid", "failed", "captured"],
+  default: "pending",
+},
+
     paymentSignature: String,
+
+
+    nextBillingDate: Date, 
+    renewalLogs: [
+      {
+        paymentId: String,
+        date: Date,
+        amount: Number, 
+        status: {
+          type: String,
+          enum: ["paid", "failed"],
+        },
+      },
+    ],
   },
   { _id: false }
 );
+
 
 const UserSchema = new mongoose.Schema(
   {
@@ -67,3 +106,4 @@ const UserSchema = new mongoose.Schema(
 );
 
 export default mongoose.model("User", UserSchema);
+

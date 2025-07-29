@@ -20,6 +20,7 @@ import paymentRoutes from "./routes/payment.routes.js";
 import s3Routes from "./routes/s3Routes.js";
 import serviceRoutes from "./routes/service.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import webhookRoutes from "./routes/webhookRoutes.js";
 import wishlistRoutes from "./routes/wishlist.routes.js";
 import connectDB from "./utils/db.js";
 dotenv.config();
@@ -29,6 +30,10 @@ const PORT = process.env.PORT || 4000;
 
 // Connect to MongoDB
 connectDB();
+
+
+
+app.use("/", webhookRoutes); 
 
 // Middlewares
 app.use(
@@ -66,7 +71,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 // Routes
-app.get("/", (req, res) => {
+app.get("/api/", (req, res) => {
   res.send("🚀 Backend is running");
 });
 
@@ -85,6 +90,7 @@ app.use("/api/subscription",subscriptionRoutes)
 app.use("/api/wishlist",wishlistRoutes)
 app.use('/api/s3', s3Routes); 
 app.use("/api/oohservices", oohServiceRoutes);
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
