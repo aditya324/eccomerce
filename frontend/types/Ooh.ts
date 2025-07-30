@@ -39,3 +39,39 @@ export interface Service {
   __v: number;
 }
 
+
+// types/oohService.ts
+
+export type OohPackage = {
+  _id: string;
+  title: string;
+  price: number;
+  billingCycle: string;
+  features: string[];
+  packageType: string;
+  subType: string;
+};
+
+export type OohService = {
+  _id: string;
+  title: string;
+  slug: string;
+  categoryId: string;
+  vendorName: string;
+  price: number;
+  thumbnail: string;
+  videoUrl: string;
+  includes: string[];
+  description: string[];
+  packages: OohPackage[];
+  faqs: {
+    question: string;
+    answer: string;
+    _id: string;
+  }[];
+  rating: number;
+  isFeatured: boolean;
+  isOOH: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
