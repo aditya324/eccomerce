@@ -18,7 +18,7 @@ import { BASEURL } from '@/constants';
 export default function PackageTablePage() {
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
   const [processingId, setProcessingId] = useState(null);
 
   const fetchPackages = () => {
@@ -34,7 +34,7 @@ export default function PackageTablePage() {
     fetchPackages();
   }, []);
 
-  const handleCreatePlan = async (packageId) => {
+  const handleCreatePlan = async (packageId:string) => {
     setProcessingId(packageId);
     try {
       const res = await axios.post(`${BASEURL}/package/create-plan/${packageId}`);

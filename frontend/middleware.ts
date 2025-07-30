@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
   const sessionCookie = request.cookies.get('jwt'); // ⚠️ Change to your actual cookie name
 
 
-   console.log('Session cookie found:', !!sessionCookie);
+
   if (!sessionCookie) {
     
     const loginUrl = new URL('/login', request.url);

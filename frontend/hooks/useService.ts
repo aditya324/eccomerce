@@ -1,6 +1,7 @@
 "use client";
-import { getAllExcept, getAllService } from "@/lib/auth/api";
+import { getAllExcept, getAllOohService, getAllService } from "@/lib/auth/api";
 import { GetServicesResponse } from "@/types/service";
+import { Service } from "@/types/Ooh";
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -18,3 +19,11 @@ export const useServiceExcept = (id: string) => {
     enabled: !!id,
   });
 };
+
+
+export const useOoh = ()=>{
+  return useQuery<Service[]>({
+    queryKey:["oohService"],
+    queryFn:()=>getAllOohService()
+  })
+}

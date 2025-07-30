@@ -5,7 +5,7 @@ import DevelopMent from "@/components/Development";
 import Marketing from "@/components/Marketing";
 import Sales from "@/components/Sales";
 import PackageSection from "@/components/PackageSection"
-
+import AllOohService from "@/components/AllOohService"
 import OutOfHome from "@/components/OutOfHome";
 
 export default function Home() {
@@ -19,6 +19,7 @@ export default function Home() {
       <Marketing />
       <Sales />
       <OutOfHome />
+      <AllOohService/>
     </div>
   );
 }

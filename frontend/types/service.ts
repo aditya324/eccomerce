@@ -61,3 +61,13 @@ interface CategoryWithServices {
   data: Category;
   services: ServiceItem[];
 }
+
+
+export interface OOHService {
+  _id: string;
+  title: string;
+  slug?: string;
+  price: number;
+  isOOH?: boolean; // ← Add this
+  packages?: { price: number }[];
+}

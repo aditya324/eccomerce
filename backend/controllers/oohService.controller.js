@@ -1,104 +1,99 @@
 import OOHService from "../models/oohService.model.js";
 
-export const AddOOHService = async (req, res) => {
-  const {
-    title,
-    slug,
-  
-    category,
-    description,
-    thumbnail,
-    videoUrl,
-    city,
-    subcategories,
-    faqs,
-    isFeatured,
-  } = req.body;
-
-  if (!title || !slug) {
-    return res.status(400).json({
-      message: "Title and slug are required.",
-    });
-  }
-
+// Create a new OOH service
+export const createOOHService = async (req, res) => {
   try {
-    const existingService = await OOHService.findOne({ slug });
-    if (existingService) {
-      return res.status(400).json({ message: "Slug already in use." });
-    }
-
-    const service = new OOHService({
-      title,
-      slug,
-      category,
-      city,
-      description,
-      thumbnail,
-      videoUrl,
-      city,
-      subcategories, 
-      faqs,
-      isFeatured: isFeatured ?? false,
-    });
-
-    const created = await service.save();
-    res.status(201).json(created);
-  } catch (err) {
-    console.error("Create OOH service error:", err);
-    res
-      .status(500)
-      .json({ message: "Failed to create OOH service", error: err.message });
+    const service = new OOHService(req.body);
+    await service.save();
+    res.status(201).json(service);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 };
-export const GetAllOOHServices = async (req, res) => {
+
+
+export const getAllOOHServices = async (req, res) => {
   try {
     const services = await OOHService.find();
     res.status(200).json(services);
-  } catch (err) {
-    res.status(500).json({ message: "Failed to fetch OOH services", error: err.message });
-  }
-};
-
-
-export const GetOOHServiceBySlug = async (req, res) => {
-  const { slug } = req.params;
-  try {
-    const service = await OOHService.findOne({ slug });
-    if (!service) {
-      return res.status(404).json({ message: "Service not found" });
-    }
-    res.status(200).json(service);
-  } catch (err) {
-    res.status(500).json({ message: "Failed to fetch service", error: err.message });
-  }
-};
-
-
-
-
-export const filterOOHServices = async (req, res) => {
-  try {
-    const { city, subcategory } = req.query;
-
-    const query = {};
-
-    if (city) {
-      query.city = city;
-    }
-
-    if (subcategory) {
-      query["subcategories.name"] = subcategory;
-    }
-
-    const services = await OOHService.find(query);
-
-    res.status(200).json(services);
   } catch (error) {
-    console.error("Filter OOH services error:", error);
-    res.status(500).json({ message: "Failed to filter services", error: error.message });
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+export const getOOHServiceById = async (req, res) => {
+  try {
+    const service = await OOHService.findById(req.params.id);
+    if (!service) return res.status(404).json({ error: "Service not found" });
+    res.status(200).json(service);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+export const updateOOHService = async (req, res) => {
+  try {
+    const service = await OOHService.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+    if (!service) return res.status(404).json({ error: "Service not found" });
+    res.status(200).json(service);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Delete OOH service by ID
+export const deleteOOHService = async (req, res) => {
+  try {
+    const service = await OOHService.findByIdAndDelete(req.params.id);
+    if (!service) return res.status(404).json({ error: "Service not found" });
+    res.status(200).json({ message: "Service deleted" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getOOHServiceBySlug = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const service = await OOHService.findOne({ slug });
+
+    if (!service) {
+      return res.status(404).json({ error: "Service not found" });
+    }
+
+    res.status(200).json(service);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 
 
 
+export const getPackagesBySubType = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { subType } = req.query;
+
+    if (!subType) {
+      return res.status(400).json({ error: "subType is required" });
+    }
+
+    const service = await OOHService.findById(id);
+    if (!service) {
+      return res.status(404).json({ error: "Service not found" });
+    }
+
+    const matchingPackages = service.packages
+      .filter(pkg => pkg.subType === subType)
+      .slice(0, 3); 
+
+    res.json({ packages: matchingPackages });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 

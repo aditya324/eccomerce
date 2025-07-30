@@ -1,5 +1,6 @@
 import { BASEURL } from "@/constants";
 import { Category, CategoryWithServicesResponse } from "@/types/category";
+import { Service } from "@/types/Ooh";
 import { GetServicesResponse } from "@/types/service";
 import { GoogleCredentialPayload } from "@/types/user";
 
@@ -108,6 +109,20 @@ export const getAllExcept = async (id:string): Promise<GetServicesResponse> => {
     throw new Error("Failed to fetch services");
   }
 };
+
+
+
+
+export const getAllOohService= async ():Promise<Service[]> =>{
+  try {
+    const res= await axios.get<Service[]>(`${BASEURL}/oohservices/`)
+
+    return res.data
+  } catch (error) {
+    console.log(error)
+    throw new Error("Could not fetch OOH services.")
+  }
+}
 
 
 

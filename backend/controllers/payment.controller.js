@@ -13,25 +13,40 @@ export const verifySubscriptionPayment = async (req, res) => {
       razorpay_signature,
     } = req.body;
 
+    if (!razorpay_payment_id || !razorpay_subscription_id || !razorpay_signature) {
+      return res.status(400).json({ ok: false, message: "Missing payment data" });
+    }
+
     const expectedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
       .update(`${razorpay_payment_id}|${razorpay_subscription_id}`)
       .digest("hex");
 
-    if (expectedSignature !== razorpay_signature) {
+    const isValid = crypto.timingSafeEqual(
+      Buffer.from(expectedSignature),
+      Buffer.from(razorpay_signature)
+    );
+
+    if (!isValid) {
       return res.status(400).json({ ok: false, message: "Invalid signature" });
     }
 
     const user = await User.findOne({
       "subscriptions.subscriptionId": razorpay_subscription_id,
     });
+
     if (!user) {
-      return res.status(404).json({ message: "Subscription not found" });
+      return res.status(404).json({ ok: false, message: "User with subscription not found" });
     }
 
     const sub = user.subscriptions.find(
       (s) => s.subscriptionId === razorpay_subscription_id
     );
+
+    if (!sub) {
+      return res.status(404).json({ ok: false, message: "Subscription not found in user record" });
+    }
+
     sub.paymentId = razorpay_payment_id;
     sub.paymentStatus = "captured";
     sub.paymentSignature = razorpay_signature;
@@ -39,12 +54,13 @@ export const verifySubscriptionPayment = async (req, res) => {
 
     await user.save();
 
-    return res.json({ ok: true }); 
+    return res.json({ ok: true, message: "Subscription verified successfully" });
   } catch (err) {
     console.error("verifySubscriptionPayment error:", err);
-    return res
-      .status(500)
-      .json({ ok: false, message: "Server error during payment verification" });
+    return res.status(500).json({
+      ok: false,
+      message: "Server error during payment verification",
+    });
   }
 };
 
