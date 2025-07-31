@@ -38,7 +38,7 @@ export default function DevelopMent() {
       </h2>
 
       <Slider {...settings}>
-        {data.services.map((service: Service) => (
+        {data?.services?.map((service: Service) => (
           <div key={service._id} className="px-5">
             <ServiceCard service={service} />
           </div>

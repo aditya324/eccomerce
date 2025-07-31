@@ -27,6 +27,9 @@ export interface Service {
   title: string;
   slug: string;
   city: string;
+  vendorName:string,
+  price:number,
+  packages:[],
   category: 'Static' | 'Digital' | string; 
   description: string[];
   thumbnail: string;

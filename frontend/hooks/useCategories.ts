@@ -17,6 +17,5 @@ export const useCategoryBySlug = (slug: string) => {
     queryKey: ["categorySlug", slug],
     queryFn: () => getCategoryBySlug(slug),
     enabled: !!slug,
-    onError: (err) => console.error("Category fetch error:", err),
   });
-}
+};

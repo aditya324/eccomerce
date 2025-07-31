@@ -10,7 +10,7 @@ import OohServiceTable from "@/components/OohServiceTable";
 const OohServiceSection = () => {
   const { data, isLoading, isError } = useOoh(); 
 
-  console.log(data)
+  console.log(data, "dataooh")
   const router = useRouter();
 
   if (isLoading) return <p className="p-6">Loading OOH services...</p>;
@@ -25,7 +25,7 @@ const OohServiceSection = () => {
           <Button onClick={() => router.push("addService")}>Add OOH Service</Button>
         </div>
       </div>
-      <OohServiceTable data={data.service} />
+      <OohServiceTable data={data} />
     </div>
   );
 };
