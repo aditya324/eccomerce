@@ -1,5 +1,6 @@
 import { Check } from "lucide-react";
 import ServiceSubscribeButton from "./ServiceSubscribeButton";
+import OohServiceSubscribeButton from "./OohServiceSubscribeButton";
 
 type OOHPackage = {
   _id: string;
@@ -78,10 +79,15 @@ export default function OohPricingSection({
                   ))}
                 </ul>
 
-                <ServiceSubscribeButton
+                {/* <ServiceSubscribeButton
                   serviceId={serviceId}
                   pkgId={pkg._id}
                   label="Get Started"
+                /> */}
+                <OohServiceSubscribeButton
+                 OohserviceId={serviceId}
+                 pkgId={pkg._id}
+                 label="Get Started"
                 />
               </div>
             ))}

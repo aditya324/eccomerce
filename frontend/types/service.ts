@@ -37,8 +37,6 @@ export interface GetServicesResponse {
   service: Service[];
 }
 
-
-
 interface Category {
   _id: string;
   name: string;
@@ -62,7 +60,6 @@ interface CategoryWithServices {
   services: ServiceItem[];
 }
 
-
 export interface OOHService {
   _id: string;
   title: string;
@@ -70,4 +67,26 @@ export interface OOHService {
   price: number;
   isOOH?: boolean; // ← Add this
   packages?: { price: number }[];
+}
+
+// types.ts
+
+interface ServiceDetails {
+  title: string;
+  thumbnail: string;
+}
+
+interface PlanDetails {
+  title: string;
+  price: number;
+  billingCycle: string;
+}
+
+export interface UserSubscription {
+  subscriptionId: string;
+  status: string;
+  paymentStatus: string;
+  service: ServiceDetails;
+  package: PlanDetails;
+  currentStart: Date;
 }

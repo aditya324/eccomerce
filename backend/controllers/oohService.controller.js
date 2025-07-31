@@ -151,3 +151,66 @@ export const createOOHServicePackagePlan = async (req, res) => {
     res.status(500).json({ message: "Failed to create Razorpay plan", error: err.message });
   }
 };
+
+export const createOohServicePackagePlan = async (req, res) => {
+  try {
+    const { oohserviceId, pkgId } = req.params;
+
+    console.log("serviceId:", req.params.oohserviceId);
+
+    console.log("pkgId:", req.params.pkgId);
+
+    const service = await OOHService.findById(oohserviceId);
+    if (!service) {
+      return res.status(404).json({ message: "oohserviceId not found" });
+    }
+
+    const pkg = OOHService.packages.id(pkgId);
+    if (!pkg) {
+      return res
+        .status(404)
+        .json({ message: "Package not found in this service" });
+    }
+
+    if (pkg.planId) {
+      return res
+        .status(400)
+        .json({ message: "This package already has a Razorpay planId" });
+    }
+
+    const period = "monthly" 
+    const interval = 1;
+    const amount = pkg.price * 100;
+    const name = `${service.title} — ${pkg.title}`;
+
+    const plan = await razorpay.plans.create({
+      period,
+      interval,
+      item: {
+        name,
+        amount,
+        currency: "INR",
+        description: `${service.title} / ${pkg.title} — ${period} subscription`,
+      },
+    });
+
+    console.log("Creating Razorpay plan with:");
+    console.log("  billingCycle:", pkg.billingCycle);
+    console.log("  price:", pkg.price);
+
+    pkg.planId = plan.id;
+    await service.save();
+
+    res.json({
+      message: "Razorpay plan created for service package",
+      planId: plan.id,
+      serviceId: service._id,
+      pkgId: pkg._id,
+    });
+  } catch (err) {
+    console.error("Error creating plan for service package:", err);
+    res
+      .status(500)
+      .json({ message: "Failed to create plan", error: err.message });
+  }
+};

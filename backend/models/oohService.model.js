@@ -4,8 +4,8 @@ import mongoose from "mongoose";
 const PackageSchema = new mongoose.Schema({
   title: { type: String, required: true },
   price: { type: Number, required: true },
-  billingCycle: { type: String, enum: ["monthly", "yearly"], default: "monthly" },
-  features: [{ type: String }],
+ billingCycle: { type: String, default: "monthly" },  features: [{ type: String }],
+ features: [String],
   planId: { type: String },
 
 

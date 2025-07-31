@@ -11,7 +11,7 @@ export const handleRazorpayWebhook = async (req, res) => {
 
   const expectedSignature = crypto
     .createHmac("sha256", razorpaySecret)
-    .update(body) // Use the raw body
+    .update(body)
     .digest("hex");
 
   if (signature !== expectedSignature) {
@@ -20,14 +20,14 @@ export const handleRazorpayWebhook = async (req, res) => {
   }
 
   try {
-    // Parse the event object from the raw body
+
     const event = JSON.parse(body.toString("utf8"));
     console.log("📥 Event Received:", event.event);
 
     let subId;
     let payloadEntity;
 
-    // ✅ Correctly identify the subscription ID based on event type
+
     if (event.event.startsWith("subscription.")) {
       payloadEntity = event.payload.subscription.entity;
       subId = payloadEntity.id;
@@ -63,10 +63,9 @@ export const handleRazorpayWebhook = async (req, res) => {
       return res.status(404).send("Subscription object not found on user");
     }
 
-    // Ensure renewal logs array exists
     sub.renewalLogs = sub.renewalLogs || [];
 
-    // ✅ Handle different event statuses with specific logic
+   
     if (event.event === "subscription.charged") {
       const payment = event.payload.payment.entity;
       sub.status = "active";
@@ -82,13 +81,13 @@ export const handleRazorpayWebhook = async (req, res) => {
 
     } else if (event.event === "subscription.activated") {
       sub.status = "active";
-      sub.paymentStatus = "paid"; // Activation implies the first payment was successful
+      sub.paymentStatus = "paid";
       sub.nextBillingDate = new Date(payloadEntity.current_end * 1000);
       console.log(`✅ Subscription activated for subId: ${subId}`);
 
     } else if (event.event === "payment.failed") {
       const payment = event.payload.payment.entity;
-      // You might want a specific status like "past_due" or "on_hold"
+    
       sub.status = "on_hold";
       sub.paymentStatus = "failed";
       sub.renewalLogs.push({
@@ -102,7 +101,7 @@ export const handleRazorpayWebhook = async (req, res) => {
     } else if (event.event === "subscription.halted" || event.event === "subscription.cancelled") {
         sub.status = "cancelled";
         sub.nextBillingDate = null;
-        console.log(`ℹ️ Subscription ${event.event} for subId: ${subId}`);
+        console.log(` Subscription ${event.event} for subId: ${subId}`);
     } else {
       console.log(`🤷‍♀️ Unhandled event type: ${event.event}`);
     }
@@ -112,7 +111,7 @@ export const handleRazorpayWebhook = async (req, res) => {
     res.status(200).send("Webhook processed successfully");
 
   } catch (error) {
-    console.error("🔥 Webhook processing error:", error.message);
+    console.error(" Webhook processing error:", error.message);
     res.status(500).send("Internal Server Error");
   }
 };

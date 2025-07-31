@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { BASEURL } from '@/constants';
 import { toast } from 'sonner';
 
-// --- Type Definitions ---
+
 interface PopulatedService {
   _id: string;
   title: string;

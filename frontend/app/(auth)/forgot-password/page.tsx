@@ -61,7 +61,7 @@ const ForgotPasswordPage = () => {
       }}
     >
       <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 rounded-2xl overflow-hidden">
-        {/* Left - Image */}
+
         <div className="hidden md:block h-full">
           <Image
             src="/signupimage.jpg"
