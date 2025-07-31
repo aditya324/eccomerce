@@ -48,10 +48,7 @@ export default function AddPackagePage() {
     }
   });
 
-  const { fields, append, remove } = useFieldArray<any, any>({
-  control,
-  name: 'features',
-});
+  const { fields: featureFields, append: appendFeature } = useFieldArray({ control,  name: 'features' as never });
 
   useEffect(() => {
     const fetchData = async () => {
