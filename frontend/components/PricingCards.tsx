@@ -2,6 +2,7 @@ import { Check } from "lucide-react";
 import ServiceSubscribeButton from "./ServiceSubscribeButton";
 
 type Package = {
+  _id:string,
   title: string;
   price: number;
   billingCycle: string;

@@ -1,17 +1,17 @@
 "use client";
 
 import { Service } from "@/types/service";
-import ServiceCard from "@/components/serviceCard";
+import ServiceCard from "@/components/ServiceCard";
 import Slider from "react-slick";
 import { useCategoryBySlug } from "@/hooks/useCategories";
 
 export default function DevelopMent() {
   const { data, isLoading, isError } = useCategoryBySlug("test-category");
 
-  console.log("data", data);
+  console.log("dev", data);
 
   if (isLoading) return <div className="px-6 py-8">Loading...</div>;
-  if (isError || !data || !data.services)
+  if (isError || !data)
     return <div className="px-6 py-8">Failed to load services.</div>;
 
   const settings = {
@@ -35,7 +35,7 @@ export default function DevelopMent() {
       </h2>
 
       <Slider {...settings}>
-        {data.services.map((service: Service) => (
+        {data?.services?.map((service: Service) => (
           <div key={service._id} className="px-5">
             <ServiceCard service={service} />
           </div>

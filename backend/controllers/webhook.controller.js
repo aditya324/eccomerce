@@ -3,77 +3,116 @@ import crypto from "crypto";
 import User from "../models/user.model.js";
 
 export const handleRazorpayWebhook = async (req, res) => {
-
-
-    console.log("🔔 Webhook hit:", req.headers["x-razorpay-signature"]);
-
   const razorpaySecret = process.env.RAZORPAY_KEY_SECRET;
   const signature = req.headers["x-razorpay-signature"];
 
+
+  const body = req.body;
+
   const expectedSignature = crypto
     .createHmac("sha256", razorpaySecret)
-    .update(req.body.toString("utf8"))
+    .update(body) // Use the raw body
     .digest("hex");
 
   if (signature !== expectedSignature) {
+    console.log("❌ Invalid Razorpay webhook signature");
     return res.status(400).send("Invalid signature");
   }
 
-  const event = JSON.parse(req.body.toString("utf8"));
-
   try {
+    // Parse the event object from the raw body
+    const event = JSON.parse(body.toString("utf8"));
+    console.log("📥 Event Received:", event.event);
+
+    let subId;
+    let payloadEntity;
+
+    // ✅ Correctly identify the subscription ID based on event type
+    if (event.event.startsWith("subscription.")) {
+      payloadEntity = event.payload.subscription.entity;
+      subId = payloadEntity.id;
+    } else if (event.event.startsWith("payment.")) {
+      payloadEntity = event.payload.payment.entity;
+      subId = payloadEntity.subscription_id;
+    }
+
+
+    if (!subId) {
+      console.log("⚠️ Could not find a subscriptionId in the payload. Ignoring event.");
+      return res.status(200).send("Event received but no action required.");
+    }
+
+    const user = await User.findOne({
+      $or: [
+        { "packageSubscriptions.subscriptionId": subId },
+        { "subscriptions.subscriptionId": subId },
+      ],
+    });
+
+    if (!user) {
+      console.log("❌ User not found for subscriptionId:", subId);
+      return res.status(404).send("User not found for subscription");
+    }
+
+    let sub =
+      user.packageSubscriptions.find((s) => s.subscriptionId === subId) ||
+      user.subscriptions.find((s) => s.subscriptionId === subId);
+
+    if (!sub) {
+      console.log("⚠️ Subscription not found inside user document for subId:", subId);
+      return res.status(404).send("Subscription object not found on user");
+    }
+
+    // Ensure renewal logs array exists
+    sub.renewalLogs = sub.renewalLogs || [];
+
+    // ✅ Handle different event statuses with specific logic
     if (event.event === "subscription.charged") {
-      const subId = event.payload.subscription.entity.id;
       const payment = event.payload.payment.entity;
-
-      // Find user with this subscription
-      const user = await User.findOne({ "packageSubscriptions.subscriptionId": subId });
-
-      if (!user) return res.status(404).send("User not found for subscription");
-
-      const sub = user.packageSubscriptions.find((s) => s.subscriptionId === subId);
-
-      
+      sub.status = "active";
+      sub.paymentStatus = "paid";
+      sub.nextBillingDate = new Date(payloadEntity.current_end * 1000);
       sub.renewalLogs.push({
         paymentId: payment.id,
         date: new Date(payment.created_at * 1000),
         amount: payment.amount / 100,
         status: "paid",
       });
+      console.log(`✅ Subscription successfully charged for subId: ${subId}`);
 
-      // Update next billing
-      const nextBillingAt = event.payload.subscription.entity.current_end;
-      sub.nextBillingDate = new Date(nextBillingAt * 1000);
-      sub.paymentStatus = "paid";
+    } else if (event.event === "subscription.activated") {
       sub.status = "active";
+      sub.paymentStatus = "paid"; // Activation implies the first payment was successful
+      sub.nextBillingDate = new Date(payloadEntity.current_end * 1000);
+      console.log(`✅ Subscription activated for subId: ${subId}`);
 
-      await user.save();
-    }
-
-    if (event.event === "payment.failed") {
-      const subId = event.payload.payment.entity.subscription_id;
+    } else if (event.event === "payment.failed") {
       const payment = event.payload.payment.entity;
-
-      const user = await User.findOne({ "packageSubscriptions.subscriptionId": subId });
-      if (!user) return res.status(404).send("User not found for failed payment");
-
-      const sub = user.packageSubscriptions.find((s) => s.subscriptionId === subId);
+      // You might want a specific status like "past_due" or "on_hold"
+      sub.status = "on_hold";
+      sub.paymentStatus = "failed";
       sub.renewalLogs.push({
         paymentId: payment.id,
         date: new Date(payment.created_at * 1000),
         amount: payment.amount / 100,
         status: "failed",
       });
+      console.log(`❌ Payment failed for subId: ${subId}`);
 
-      sub.paymentStatus = "failed";
-       
-
-      await user.save();
+    } else if (event.event === "subscription.halted" || event.event === "subscription.cancelled") {
+        sub.status = "cancelled";
+        sub.nextBillingDate = null;
+        console.log(`ℹ️ Subscription ${event.event} for subId: ${subId}`);
+    } else {
+      console.log(`🤷‍♀️ Unhandled event type: ${event.event}`);
     }
 
-    return res.status(200).send("Webhook processed");
+    await user.save();
+
+    res.status(200).send("Webhook processed successfully");
+
   } catch (error) {
-    console.error("Webhook error:", error);
-    res.status(500).send("Server error");
+    console.error("🔥 Webhook processing error:", error.message);
+    res.status(500).send("Internal Server Error");
   }
 };

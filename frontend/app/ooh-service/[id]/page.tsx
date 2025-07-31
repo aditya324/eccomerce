@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import { BASEURL } from "@/constants";
 import TrustedByLogos from "@/components/TrustedByLogos";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import AllServiceExcept from "../../../components/AllServiceExcept";
+import OohPricingSection from "@/components/OohPricingSection";
 
 interface Package {
+  _id: string;
   title: string;
   price: number;
   billingCycle: string;
@@ -25,11 +27,12 @@ interface OOHService {
   description: string[];
   includes: string[];
   location: string;
+  packages: Package[];
 }
 
 const FILTERS: Record<"Static" | "Digital", string[]> = {
   Static: ["Hoarding", "Inside Railway Station", "Popups"],
-  Digital: ["LED", "Ticket Counter", "Platform TV"]
+  Digital: ["LED", "Ticket Counter", "Platform TV"],
 };
 
 interface DropdownProps {
@@ -60,23 +63,13 @@ export default function OOHDetailsPage() {
   const [ooh, setOoh] = useState<OOHService | null>(null);
   const [packageType, setPackageType] = useState<"Static" | "Digital" | "">("");
   const [subType, setSubType] = useState<string>("");
-  const [filteredPackages, setFilteredPackages] = useState<Package[]>([]);
 
   useEffect(() => {
     if (!id) return;
-
     axios.get(`${BASEURL}/oohservices/getOOHById/${id}`).then((res) => {
       setOoh(res.data);
     });
   }, [id]);
-
-  useEffect(() => {
-    if (!id || !subType) return;
-
-    axios.get(`${BASEURL}/oohservices/${id}/packages?subType=${subType}`).then((res) => {
-      setFilteredPackages(res.data.packages);
-    });
-  }, [id, subType]);
 
   if (!ooh) return <div className="text-center py-8 text-lg">Loading OOH service...</div>;
 
@@ -99,18 +92,18 @@ export default function OOHDetailsPage() {
               <Dropdown label="Sub-Type" options={FILTERS[packageType]} value={subType} onChange={setSubType} />
             )}
 
-            <button className="bg-yellow-400 hover:bg-yellow-500 transition text-white w-full py-2 rounded font-semibold">Contact Us</button>
+            {/* <button className="bg-yellow-400 hover:bg-yellow-500 transition text-white w-full py-2 rounded font-semibold">Contact Us</button> */}
 
-            <div className="border border-yellow-400 text-yellow-700 p-3 rounded bg-yellow-50 text-sm">
+            {/* <div className="border border-yellow-400 text-yellow-700 p-3 rounded bg-yellow-50 text-sm">
               <p className="font-bold">🚀 Boost Your Visibility!</p>
               <p>OOH Ads deliver unmatched reach and recall.</p>
-            </div>
+            </div> */}
           </div>
 
-          <div className="pt-4 text-gray-500 text-xs space-y-1">
+          {/* <div className="pt-4 text-gray-500 text-xs space-y-1">
             <p>🛡️ Verified Location</p>
             <p>📆 Book for a month or more</p>
-          </div>
+          </div> */}
         </div>
 
         <div className="bg-white border border-gray-300 rounded-lg p-6 shadow-sm" style={{ width: "344px", height: "492px" }}>
@@ -124,27 +117,11 @@ export default function OOHDetailsPage() {
       </div>
 
       {subType && (
-        <div className="bg-gray-50 py-10 px-6 md:px-20">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">Packages for: {subType}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPackages.map((pkg, i) => (
-              <div key={i} className="border-2 rounded-lg shadow-md p-6 bg-white hover:shadow-lg transition">
-                <h3 className="text-xl font-semibold mb-2">{pkg.title}</h3>
-                <p className="text-sm text-gray-500 mb-2">Type: {pkg.packageType}</p>
-                <p className="text-sm text-gray-500 mb-2">Sub-Type: {pkg.subType}</p>
-                <p className="text-orange-600 font-bold text-lg mb-2">₹{pkg.price}</p>
-                <ul className="list-disc pl-5 text-sm text-gray-700 space-y-1 mb-4">
-                  {pkg.features.map((feature, j) => (
-                    <li key={j}>{feature}</li>
-                  ))}
-                </ul>
-                <button className="bg-yellow-400 hover:bg-yellow-500 w-full py-2 text-white font-semibold rounded">
-                  Get This Plan
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
+        <OohPricingSection
+          serviceId={id as string}
+          packages={ooh.packages}
+          selectedSubType={subType}
+        />
       )}
 
       <div className="bg-gray-50 py-12 px-6 md:px-20">

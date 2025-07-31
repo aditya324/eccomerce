@@ -8,9 +8,10 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import Link from "next/link";
 import { useGoogleLogin, useRegister } from "@/hooks/useauth";
-
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -29,6 +30,7 @@ export default function RegisterPage() {
     register.mutate(form, {
       onSuccess: () => {
         toast.success("Account created successfully!");
+        router.push("/login");
         setForm({ name: "", email: "", password: "" });
       },
       onError: (err: unknown) => {

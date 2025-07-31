@@ -33,7 +33,7 @@ connectDB();
 
 
 
-app.use("/", webhookRoutes); 
+app.use("/razorpay/webhook", express.raw({ type: "application/json" }), webhookRoutes);
 
 // Middlewares
 app.use(
@@ -90,6 +90,12 @@ app.use("/api/subscription",subscriptionRoutes)
 app.use("/api/wishlist",wishlistRoutes)
 app.use('/api/s3', s3Routes); 
 app.use("/api/oohservices", oohServiceRoutes);
+
+
+app.use((req, res, next) => {
+  console.log("❌ No route matched:", req.method, req.originalUrl);
+  res.status(404).send("Not Found");
+});
 
 // Start server
 app.listen(PORT, () => {

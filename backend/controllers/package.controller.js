@@ -20,10 +20,10 @@ export const createPackage = async (req, res) => {
       features,
       category,
       isFeatured,
-      planId,
+   
     } = req.body;
 
-    if (!title || !slug || !price || !serviceIds.length || !planId) {
+    if (!title || !slug || !price || !serviceIds.length ) {
       return res.status(400).json({ message: "Missing required fields." });
     }
 
@@ -53,7 +53,6 @@ export const createPackage = async (req, res) => {
       features,
       category,
       isFeatured,
-      planId, 
     });
 
     const saved = await newPackage.save();

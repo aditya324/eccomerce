@@ -1,3 +1,4 @@
+// components/PackageTablePage.tsx
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -14,17 +15,44 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BASEURL } from '@/constants';
+import { toast } from 'sonner';
+
+// --- Type Definitions ---
+interface PopulatedService {
+  _id: string;
+  title: string;
+}
+
+interface PopulatedCategory {
+  _id: string;
+  name: string;
+}
+
+interface Package {
+  _id: string;
+  title: string;
+  slug: string;
+  price: number;
+  billingCycle: 'monthly' | 'yearly';
+  planId: string | null;
+  serviceIds: PopulatedService[];
+  features: string[];
+  category: PopulatedCategory;
+  isFeatured: boolean;
+}
 
 export default function PackageTablePage() {
-  const [packages, setPackages] = useState([]);
+  // --- Typed State ---
+  const [packages, setPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [processingId, setProcessingId] = useState(null);
+  const [processingId, setProcessingId] = useState<string | null>(null);
 
   const fetchPackages = () => {
     setLoading(true);
+    // --- Typed API Call ---
     axios
-      .get(`${BASEURL}/package/getAllPackages`)
+      .get<Package[]>(`${BASEURL}/package/getAllPackages`)
       .then(({ data }) => setPackages(data))
       .catch(() => setError('Failed to load packages'))
       .finally(() => setLoading(false));
@@ -34,14 +62,14 @@ export default function PackageTablePage() {
     fetchPackages();
   }, []);
 
-  const handleCreatePlan = async (packageId:string) => {
+  const handleCreatePlan = async (packageId: string) => {
     setProcessingId(packageId);
     try {
-      const res = await axios.post(`${BASEURL}/package/create-plan/${packageId}`);
-      alert(`Plan Created: ${res.data.planId}`);
+      const res = await axios.post<{ planId: string }>(`${BASEURL}/package/create-plan/${packageId}`);
+      toast.success(`Plan Created: ${res.data.planId}`);
       fetchPackages(); // Refresh data
-    } catch (err) {
-      alert(err.response?.data?.message || "Failed to create plan");
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to create plan");
     } finally {
       setProcessingId(null);
     }
@@ -58,7 +86,7 @@ export default function PackageTablePage() {
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <Table className="mx-auto text-lg">
+            <Table className="mx-auto text-base">
               <TableCaption>List of all package plans</TableCaption>
               <TableHeader>
                 <TableRow>
@@ -75,19 +103,21 @@ export default function PackageTablePage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
+                {/* 'pkg' is now correctly typed as 'Package' */}
                 {packages.map((pkg) => (
                   <TableRow key={pkg._id}>
-                    <TableCell>{pkg.title}</TableCell>
+                    <TableCell className="font-medium">{pkg.title}</TableCell>
                     <TableCell>{pkg.slug}</TableCell>
                     <TableCell>₹{pkg.price.toLocaleString()}</TableCell>
-                    <TableCell>{pkg.billingCycle}</TableCell>
+                    <TableCell className="capitalize">{pkg.billingCycle}</TableCell>
                     <TableCell>
-                      {pkg.serviceIds?.map((s) => s?.title || '').join(', ')}
+                      {pkg.serviceIds?.map((s) => s.title).join(', ')}
                     </TableCell>
                     <TableCell>{pkg.features?.join(', ')}</TableCell>
-                    <TableCell>{pkg.category}</TableCell>
+                    {/* FIX: Display category name instead of object */}
+                    <TableCell>{pkg.category?.name}</TableCell>
                     <TableCell>{pkg.isFeatured ? 'Yes' : 'No'}</TableCell>
-                    <TableCell>{pkg.planId || '—'}</TableCell>
+                    <TableCell className="font-mono">{pkg.planId || '—'}</TableCell>
                     <TableCell>
                       <Button
                         size="sm"

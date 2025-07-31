@@ -1,7 +1,7 @@
 "use client";
 
 import { Service } from "@/types/service";
-import ServiceCard from "@/components/serviceCard";
+import ServiceCard from "@/components/ServiceCard";
 import Slider from "react-slick";
 import { useCategoryBySlug } from "@/hooks/useCategories";
 

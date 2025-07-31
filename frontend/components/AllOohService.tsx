@@ -10,6 +10,9 @@ import "slick-carousel/slick/slick-theme.css";
 export default function AllService() {
   const { data, isLoading, isError } = useOoh();
 
+
+  console.log(data, "oohservice")
+
   if (isLoading) return <div className="px-6 py-8">Loading...</div>;
   if (isError || !data) return <div className="px-6 py-8">Failed to load services.</div>;
 
@@ -39,7 +42,7 @@ export default function AllService() {
       </h2>
 
       <Slider {...settings}>
-        {data.map((service: Service) => (
+        {data.service.map((service: Service) => (
           <div key={service._id} className="px-5">
             <OohServiceCard service={service} />
           </div>

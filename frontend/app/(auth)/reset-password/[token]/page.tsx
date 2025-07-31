@@ -33,7 +33,7 @@ const ResetPasswordPage = () => {
     mutationFn: (password) =>
       axios.post(`${BASEURL}/users/reset-password/${token}`, { password }, { withCredentials: true }),
     onSuccess: (res) => {
-      toast.success(res.data.message || "Password reset successful");
+      toast.success("Password reset successful");
       router.push("/login");
     },
     onError: (err) => {
@@ -112,9 +112,9 @@ const ResetPasswordPage = () => {
             <Button
               type="submit"
               className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold h-12"
-              disabled={resetPassword.isLoading}
+              disabled={resetPassword.isPending}
             >
-              {resetPassword.isLoading ? "Resetting..." : "Reset Password"}
+              {resetPassword.isPending ? "Resetting..." : "Reset Password"}
             </Button>
           </form>
         </div>

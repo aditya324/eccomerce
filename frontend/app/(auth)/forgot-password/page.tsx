@@ -27,10 +27,17 @@ const ForgotPasswordPage = () => {
   >({
     mutationFn: (email) =>
       axios.post(`${BASEURL}/users/forgot-password`, { email }, { withCredentials: true }),
+    
+    // Optional: If you want to log when the mutation starts, use onMutate
+    onMutate: (email) => {
+      console.log("Starting to send reset link for:", email);
+    },
+
     onSuccess: (res) => {
       toast.success(res.data.message || "Reset link sent!");
       setEmail("");
     },
+    
     onError: (error) => {
       toast.error(error.response?.data?.message || "Something went wrong.");
     },
@@ -94,9 +101,9 @@ const ForgotPasswordPage = () => {
             <Button
               type="submit"
               className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold h-12"
-              disabled={forgotPassword.isLoading}
+              disabled={forgotPassword.isPending}
             >
-              {forgotPassword.isLoading ? "Sending..." : "Send Reset Link"}
+              {forgotPassword.isPending ? "Sending..." : "Send Reset Link"}
             </Button>
 
             {/* Back to login */}

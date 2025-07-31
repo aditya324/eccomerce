@@ -71,7 +71,7 @@ export default function ServiceSubscribeButton({
           }
         },
         theme: { color: "#FBBF24" },
-      };
+      } as RazorpayOptions;
 
       new window.Razorpay(options).open();
     } catch (err: unknown) {

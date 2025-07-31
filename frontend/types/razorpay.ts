@@ -2,40 +2,21 @@
  * Defines the options object passed to the Razorpay constructor.
  */
 export interface RazorpayOptions {
-  /** Your public Razorpay key. */
   key: string;
-  /** The transaction amount, in the smallest currency unit (e.g., paise for INR). */
-  amount: number | string;
-  /** The currency for the transaction (e.g., "INR"). */
-  currency: string;
-  /** Your business or product name. */
+  subscription_id?: string;
+  order_id?: string;
+  amount?: number;
+  currency?: string;
   name: string;
-  /** A brief description of the transaction. */
-  description?: string;
-  /** A URL for your business logo. */
-  image?: string;
-  /** The unique ID for the order created on your server. */
-  order_id: string;
-  /**
-   * The callback function that executes upon successful payment.
-   * @param response - The successful payment details.
-   */
-  handler?: (response: RazorpayPaymentSuccessResponse) => void;
-  /** Pre-fills customer details on the checkout form. */
-  prefill?: {
-    name?: string;
-    email?: string;
-    contact?: string;
-  };
-  /** Custom notes for the transaction. */
-  notes?: Record<string, string>;
-  /** Customizes the appearance of the checkout modal. */
+  description: string;
+  handler: (response: {
+    razorpay_payment_id: string;
+    razorpay_subscription_id?: string;
+    razorpay_order_id?: string;
+    razorpay_signature: string;
+  }) => void | Promise<void>;
   theme?: {
-    color?: string;
-  };
-  /** The function to call when the checkout modal is dismissed. */
-  modal?: {
-    ondismiss?: () => void;
+    color: string;
   };
 }
 
