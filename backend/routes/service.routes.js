@@ -3,6 +3,7 @@ import express from "express";
 import {
   AddService,
   createServicePackagePlan,
+  deleteService,
   getAllService,
   getExceptService,
   getService,
@@ -28,7 +29,7 @@ router.post(
   isAdmin,
   createServicePackagePlan
 );
-
+router.delete("/delete/:id",protect,isAdmin, deleteService)
 
 
 router.post("/updateService/:id", protect, isAdmin, updateService);
@@ -39,5 +40,8 @@ router.post(
   protect,
   createServiceSubscription
 );
+
+
+
 
 export default router;

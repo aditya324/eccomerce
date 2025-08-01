@@ -1,6 +1,6 @@
 import express from "express";
 
-import {createOOHService, createOohServicePackagePlan, createOOHServicePackagePlan, getAllOOHServices, getOOHServiceById, getOOHServiceBySlug, getPackagesBySubType } from "../controllers/oohService.controller.js";
+import {createOOHService, createOohServicePackagePlan, createOOHServicePackagePlan, getAllOOHServices, getOOHServiceById, getOOHServiceBySlug, getPackagesBySubType, subscribeToOohService } from "../controllers/oohService.controller.js";
 import protect from "../middlewares/authMiddleware.js";
 import { isAdmin } from "../middlewares/isAdmin.js";
 
@@ -17,7 +17,7 @@ router.post("/:serviceId/packages/:pkgId/create-plan", createOOHServicePackagePl
 router.post(
   "/:oohserviceId/packages/:pkgId/subscribe",
   protect,
-  createOohServicePackagePlan
+  subscribeToOohService
 );
 
 export default router;

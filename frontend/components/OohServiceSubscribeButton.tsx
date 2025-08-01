@@ -15,8 +15,8 @@ interface Props {
 
 declare global {
   interface Window {
-  Razorpay: new (options: RazorpayOptions) => RazorpayInstance;
-}
+    Razorpay: new (options: RazorpayOptions) => RazorpayInstance;
+  }
 }
 
 export default function OohServiceSubscribeButton({
@@ -25,7 +25,6 @@ export default function OohServiceSubscribeButton({
   label,
 }: Props) {
   const [loading, setLoading] = useState(false);
-
 
   const handleSubscribe = async () => {
     setLoading(true);
@@ -50,11 +49,13 @@ export default function OohServiceSubscribeButton({
           console.log("Razorpay response:", response);
           try {
             await axios.post(
-              `${BASEURL}/payments/verify`,
+              `${BASEURL}/payments/verify/verify-ooh`,
               {
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_subscription_id: response.razorpay_subscription_id,
                 razorpay_signature: response.razorpay_signature,
+                oohServiceId: OohserviceId,
+                packageId: pkgId,
               },
               { withCredentials: true }
             );

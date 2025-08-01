@@ -21,56 +21,67 @@ export const createServiceSubscription = async (req, res) => {
     const user = await User.findById(userId);
     let customerId = user.razorpayCustomerId;
 
-    // Create a Razorpay Customer if one doesn't exist for the user
+  
     if (!customerId) {
       const customer = await razorpay.customers.create({
         name: user.name,
         email: user.email,
-        contact: user.billingDetails.phoneNumber,
+        contact: user.billingDetails?.phoneNumber || undefined,
       });
+
       customerId = customer.id;
       user.razorpayCustomerId = customerId;
       await user.save();
     }
 
-
+  
     const subscription = await razorpay.subscriptions.create({
       plan_id: pkg.planId,
       customer_id: customerId,
-      customer_notify: 1,
-  
       total_count: pkg.billingCycle === "yearly" ? 12 : 6,
+      customer_notify: 1, 
     });
 
 
-    const newSubscription = {
+    const currentStart = subscription.start_at
+      ? new Date(subscription.start_at * 1000)
+      : null;
+    const currentEnd = subscription.current_end
+      ? new Date(subscription.current_end * 1000)
+      : null;
+
+  
+    user.subscriptions.push({
       subscriptionId: subscription.id,
       packageId: pkg._id,
-      status: subscription.status, // Will be 'created' initially
-      currentStart: new Date(subscription.start_at * 1000),
-    };
+      status: "created",
+      paymentStatus: "pending",
+      currentStart,
+      currentEnd,
+      paymentId: null,
+      paymentSignature: null,
+      nextBillingDate: null,
+      renewalLogs: [],
+    });
 
-
-    if (subscription.current_end) {
-      newSubscription.currentEnd = new Date(subscription.current_end * 1000);
-    }
-    
-    user.subscriptions.push(newSubscription);
     await user.save();
 
-   
-    res.json({
+
+    return res.json({
+      message: "Subscription created successfully",
       subscriptionId: subscription.id,
       razorpayKey: process.env.RAZORPAY_KEY_ID,
     });
 
   } catch (err) {
-    console.error("createServiceSubscription error:", err);
-    res
-      .status(500)
-      .json({ message: "Failed to create subscription", error: err.message });
+    console.error("❌ createServiceSubscription error:", err);
+    res.status(500).json({
+      message: "Failed to create subscription",
+      error: err.message,
+    });
   }
 };
+
 
 
 

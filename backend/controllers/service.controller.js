@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 import Category from "../models/category.model.js";
 import Service from "../models/service.model.js";
 import { razorpay } from "../utils/razorpay.js";
@@ -101,16 +103,18 @@ export const getAllService = async (req, res) => {
     const service = await Service.find();
 
     if (service.length === 0) {
-      res.status(401).json({ message: "no Services Found" });
+      return res.status(404).json({ message: "No services found." });
     }
 
-    res
+    return res
       .status(200)
-      .json({ message: "Service Fetched Successfully", service: service });
+      .json({ message: "Services fetched successfully.", service });
   } catch (error) {
-    res.status(500).json({ message: "Service fetched Successfully" });
+    console.error("Error fetching services:", error);
+    return res.status(500).json({ message: "Internal server error." });
   }
 };
+
 export const searchServices = async (req, res) => {
   const { q } = req.query;
 
@@ -279,5 +283,36 @@ export const createServicePackagePlan = async (req, res) => {
     res
       .status(500)
       .json({ message: "Failed to create plan", error: err.message });
+  }
+};
+
+
+
+export const deleteService = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid service ID format." });
+    }
+
+
+    const deletedService = await Service.findByIdAndDelete(id);
+
+
+    if (!deletedService) {
+      return res.status(404).json({ message: "Service not found." });
+    }
+
+    res.status(200).json({
+  success: true,
+  message: "Service deleted successfully.",
+});
+
+
+  } catch (error) {
+    console.error("Error deleting service:", error);
+    res.status(500).json({ message: "Server error while deleting service." });
   }
 };

@@ -1,6 +1,8 @@
+import mongoose from "mongoose";
+
 import OOHService from "../models/oohService.model.js";
 import { razorpay } from "../utils/razorpay.js";
-
+import User from "../models/user.model.js"
 // Create a new OOH service
 export const createOOHService = async (req, res) => {
   try {
@@ -104,9 +106,6 @@ export const createOOHServicePackagePlan = async (req, res) => {
   try {
     const { serviceId, pkgId } = req.params;
 
-    console.log("OOH serviceId:", serviceId);
-    console.log("OOH pkgId:", pkgId);
-
     const oohService = await OOHService.findById(serviceId);
     if (!oohService) {
       return res.status(404).json({ message: "OOH Service not found" });
@@ -126,31 +125,43 @@ export const createOOHServicePackagePlan = async (req, res) => {
     const amount = pkg.price * 100;
     const name = `${oohService.title} — ${pkg.title}`;
 
-    const plan = await razorpay.plans.create({
-      period,
-      interval,
-      item: {
-        name,
-        amount,
-        currency: "INR",
-        description: `${oohService.title} / ${pkg.title} — ${period} subscription`,
-      },
-    });
+    let plan;
+    try {
+      plan = await razorpay.plans.create({
+        period,
+        interval,
+        item: {
+          name,
+          amount,
+          currency: "INR",
+          description: `${oohService.title} / ${pkg.title} — ${period} subscription`,
+        },
+      });
+    } catch (err) {
+      console.error("❌ Razorpay error:", err);
+      return res.status(500).json({ message: "Failed to create plan", error: err.message });
+    }
+
+    if (!plan?.id) {
+      return res.status(500).json({ message: "Invalid Razorpay response" });
+    }
 
     pkg.planId = plan.id;
     await oohService.save();
 
-    res.json({
+    return res.json({
       message: "Razorpay plan created for OOH service package",
       planId: plan.id,
       serviceId: oohService._id,
       pkgId: pkg._id,
     });
+
   } catch (err) {
-    console.error("Error creating Razorpay plan for OOH service:", err);
-    res.status(500).json({ message: "Failed to create Razorpay plan", error: err.message });
+    console.error("❌ Error creating Razorpay plan for OOH service:", err);
+    return res.status(500).json({ message: "Internal Server Error", error: err.message });
   }
 };
+
 
 export const createOohServicePackagePlan = async (req, res) => {
   try {
@@ -212,5 +223,76 @@ export const createOohServicePackagePlan = async (req, res) => {
     res
       .status(500)
       .json({ message: "Failed to create plan", error: err.message });
+  }
+};
+
+
+
+
+export const subscribeToOohService = async (req, res) => {
+  try {
+    const { oohserviceId, pkgId } = req.params;
+    const userId = req.user._id; // Make sure `protect` middleware adds this
+
+    if (!mongoose.Types.ObjectId.isValid(oohserviceId)) {
+      return res.status(400).json({ message: "Invalid service ID format" });
+    }
+
+    const oohService = await OOHService.findById(oohserviceId);
+    if (!oohService) {
+      return res.status(404).json({ message: "OOH Service not found" });
+    }
+
+    const pkg = oohService.packages.id(pkgId);
+    if (!pkg) {
+      return res.status(404).json({ message: "Package not found" });
+    }
+
+    const planId = pkg.planId;
+    if (!planId) {
+      return res.status(400).json({ message: "No planId exists for this package." });
+    }
+
+
+    const subscription = await razorpay.subscriptions.create({
+      plan_id: planId,
+      customer_notify: 1,
+      total_count: 12, 
+    });
+
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.oohSubscriptions.push({
+      oohServiceId: oohserviceId,
+      subscriptionId: subscription.id,
+      packageId: pkg._id,
+      status: "created",
+      paymentStatus: "pending",
+      currentStart: null,
+      currentEnd: null,
+      paymentId: null,
+      paymentSignature: null,
+      nextBillingDate: null,
+      renewalLogs: [],
+    });
+
+    await user.save();
+
+  
+    res.status(200).json({
+      message: "Subscription created",
+      subscriptionId: subscription.id,
+      razorpayKey: process.env.RAZORPAY_KEY_ID,
+    });
+  } catch (err) {
+    console.error("❌ Subscription creation failed:", err);
+    res.status(500).json({
+      message: "Failed to create subscription",
+      error: err.message || "Unknown error",
+    });
   }
 };

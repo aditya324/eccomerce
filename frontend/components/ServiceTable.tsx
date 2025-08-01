@@ -13,6 +13,8 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import CreateServicePlanButton from "@/components/CreateServicePlanButton";
 import { useRouter } from "next/navigation";
+import { deleteServiceById } from "@/lib/auth/api";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Extend the Service type to include packages
 type Package = {
@@ -31,7 +33,7 @@ type Service = {
   isFeatured: boolean;
   createdAt: string;
   slug: string;
-  packages: Package[];  // nested packages
+  packages: Package[];
 };
 
 export default function ServiceTable({ data }: { data: Service[] }) {
@@ -39,7 +41,9 @@ export default function ServiceTable({ data }: { data: Service[] }) {
   const [sorting, setSorting] = useState<any[]>([]);
   const [columnFilters, setColumnFilters] = useState<any[]>([]);
 
-  const router=useRouter()
+  const router = useRouter();
+
+  const queryClient = useQueryClient();
 
   const columns = useMemo<ColumnDef<Service>[]>(
     () => [
@@ -64,7 +68,8 @@ export default function ServiceTable({ data }: { data: Service[] }) {
       {
         header: "Created At",
         accessorKey: "createdAt",
-        cell: (info) => new Date(info.getValue() as string).toLocaleDateString(),
+        cell: (info) =>
+          new Date(info.getValue() as string).toLocaleDateString(),
       },
       {
         header: "Slug",
@@ -96,12 +101,41 @@ export default function ServiceTable({ data }: { data: Service[] }) {
         header: "Actions",
         cell: ({ row }) => {
           const service = row.original;
+
+          const handleDelete = async (id: string, title: string) => {
+            const confirmed = window.confirm(
+              `Are you sure you want to delete "${title}"?`
+            );
+            if (!confirmed) return;
+            try {
+              const result = await deleteServiceById(id);
+              if (result.success) {
+                alert("Service deleted successfully.");
+                queryClient.invalidateQueries({ queryKey: ["Service"] });
+              } else {
+                alert("Deletion failed. Try again.");
+              }
+            } catch (error: unknown) {
+              const err = error as Error;
+              console.error("Deletion error:", err.message);
+              alert("An error occurred during deletion.");
+            }
+          };
+
           return (
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/update/${service._id}`)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push(`/dashboard/update/${service._id}`)}
+              >
                 Edit
               </Button>
-              <Button variant="destructive" size="sm" onClick={() => console.log("Delete", service._id)}>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => handleDelete(service._id, service.title)}
+              >
                 Delete
               </Button>
             </div>
@@ -150,7 +184,10 @@ export default function ServiceTable({ data }: { data: Service[] }) {
                   className="border px-4 py-2 text-left cursor-pointer select-none"
                   onClick={header.column.getToggleSortingHandler()}
                 >
-                  {flexRender(header.column.columnDef.header, header.getContext())}
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext()
+                  )}
                   {header.column.getIsSorted() === "asc" && " 🔼"}
                   {header.column.getIsSorted() === "desc" && " 🔽"}
                 </th>
@@ -181,7 +218,8 @@ export default function ServiceTable({ data }: { data: Service[] }) {
 
       <div className="flex items-center justify-between text-sm">
         <div>
-          Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+          Page {table.getState().pagination.pageIndex + 1} of{" "}
+          {table.getPageCount()}
         </div>
         <div className="space-x-2">
           <button

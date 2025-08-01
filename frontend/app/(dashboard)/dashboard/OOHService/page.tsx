@@ -25,7 +25,7 @@ const OohServiceSection = () => {
           <Button onClick={() => router.push("addService")}>Add OOH Service</Button>
         </div>
       </div>
-      <OohServiceTable data={data} />
+      <OohServiceTable data={data.service} />
     </div>
   );
 };

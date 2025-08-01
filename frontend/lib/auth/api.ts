@@ -31,10 +31,8 @@ export const loginUser = async (formData: {
     const res = await axios.post(`${BASEURL}/users/login`, formData, {
       withCredentials: true,
     });
-     console.log("result", res.data);
-    return res.data
-
-   
+    console.log("result", res.data);
+    return res.data;
   } catch (error) {
     throw new Error(`invalid credentials please check your credentials `);
   }
@@ -97,8 +95,9 @@ export const getCategoryBySlug = async (
   }
 };
 
-
-export const getAllExcept = async (id:string): Promise<GetServicesResponse> => {
+export const getAllExcept = async (
+  id: string
+): Promise<GetServicesResponse> => {
   try {
     const res = await axios.get<GetServicesResponse>(
       `${BASEURL}/service/getAllExcept/${id}`
@@ -110,20 +109,27 @@ export const getAllExcept = async (id:string): Promise<GetServicesResponse> => {
   }
 };
 
-
-
-
-export const getAllOohService= async ():Promise<Service[]> =>{
+export const getAllOohService = async (): Promise<Service[]> => {
   try {
-    const res= await axios.get<Service[]>(`${BASEURL}/oohservices/`)
+    const res = await axios.get<Service[]>(`${BASEURL}/oohservices/`);
 
-    return res.data
+    return res.data;
   } catch (error) {
-    console.log(error)
-    throw new Error("Could not fetch OOH services.")
+    console.log(error);
+    throw new Error("Could not fetch OOH services.");
   }
-}
+};
 
-
-
-
+export const deleteServiceById = async (
+  serviceId: string
+): Promise<{ success: boolean }> => {
+  try {
+    const response = await axios.delete(`${BASEURL}/service/delete/${serviceId}`,{
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.log("failed to delete service", error);
+    throw new Error("could not delete service");
+  }
+};

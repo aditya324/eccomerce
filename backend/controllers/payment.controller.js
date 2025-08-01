@@ -108,7 +108,95 @@ export const verifyPackagePayment = async (req, res) => {
   }
 };
 
+export const verifyOohSubscriptionPayment = async (req, res) => {
+  try {
+    const {
+      razorpay_payment_id,
+      razorpay_subscription_id,
+      razorpay_signature,
+      oohServiceId,
+      packageId,
+    } = req.body;
 
+
+    if (
+      !razorpay_payment_id ||
+      !razorpay_subscription_id ||
+      !razorpay_signature ||
+      !oohServiceId ||
+      !packageId
+    ) {
+      return res.status(400).json({ ok: false, message: "Missing required fields" });
+    }
+
+
+    const expectedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(`${razorpay_payment_id}|${razorpay_subscription_id}`)
+      .digest("hex");
+
+    const isValid = crypto.timingSafeEqual(
+      Buffer.from(expectedSignature),
+      Buffer.from(razorpay_signature)
+    );
+
+    if (!isValid) {
+      return res.status(400).json({ ok: false, message: "Invalid signature" });
+    }
+
+  
+    const user = await User.findOne({
+      "oohSubscriptions.subscriptionId": razorpay_subscription_id,
+    });
+
+  
+    if (!user) {
+      return res.status(404).json({
+        ok: false,
+        message: "User with matching OOH subscription not found",
+      });
+    }
+
+   
+    const sub = user.oohSubscriptions.find(
+      (s) => s.subscriptionId === razorpay_subscription_id
+    );
+
+    if (!sub) {
+      return res.status(404).json({
+        ok: false,
+        message: "OOH subscription not found in user record",
+      });
+    }
+
+
+    sub.paymentId = razorpay_payment_id;
+    sub.paymentStatus = "captured";
+    sub.paymentSignature = razorpay_signature;
+    sub.status = "active";
+    sub.currentStart = new Date(); 
+    sub.renewalLogs = sub.renewalLogs || [];
+    sub.renewalLogs.push({
+      paymentId: razorpay_payment_id,
+      date: new Date(),
+      amount: 0, 
+      status: "paid",
+    });
+
+    await user.save();
+
+    return res.json({
+      ok: true,
+      message: "OOH subscription payment verified successfully",
+    });
+  } catch (err) {
+    console.error("verifyOohSubscriptionPayment error:", err);
+    return res.status(500).json({
+      ok: false,
+      message: "Server error during OOH subscription verification",
+    });
+  }
+};
 
 
 

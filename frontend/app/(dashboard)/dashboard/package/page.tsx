@@ -1,8 +1,8 @@
 // components/PackageTablePage.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Table,
   TableBody,
@@ -11,12 +11,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { BASEURL } from '@/constants';
-import { toast } from 'sonner';
-
+} from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { BASEURL } from "@/constants";
+import { toast } from "sonner";
 
 interface PopulatedService {
   _id: string;
@@ -33,7 +32,7 @@ interface Package {
   title: string;
   slug: string;
   price: number;
-  billingCycle: 'monthly' | 'yearly';
+  billingCycle: "monthly" | "yearly";
   planId: string | null;
   serviceIds: PopulatedService[];
   features: string[];
@@ -54,7 +53,7 @@ export default function PackageTablePage() {
     axios
       .get<Package[]>(`${BASEURL}/package/getAllPackages`)
       .then(({ data }) => setPackages(data))
-      .catch(() => setError('Failed to load packages'))
+      .catch(() => setError("Failed to load packages"))
       .finally(() => setLoading(false));
   };
 
@@ -65,7 +64,9 @@ export default function PackageTablePage() {
   const handleCreatePlan = async (packageId: string) => {
     setProcessingId(packageId);
     try {
-      const res = await axios.post<{ planId: string }>(`${BASEURL}/package/create-plan/${packageId}`);
+      const res = await axios.post<{ planId: string }>(
+        `${BASEURL}/package/create-plan/${packageId}`
+      );
       toast.success(`Plan Created: ${res.data.planId}`);
       fetchPackages(); // Refresh data
     } catch (err: any) {
@@ -75,15 +76,21 @@ export default function PackageTablePage() {
     }
   };
 
-  if (loading) return <p className="text-center mt-10 text-lg">Loading packages…</p>;
-  if (error) return <p className="text-center mt-10 text-red-600 text-lg">{error}</p>;
+  if (loading)
+    return <p className="text-center mt-10 text-lg">Loading packages…</p>;
+  if (error)
+    return <p className="text-center mt-10 text-red-600 text-lg">{error}</p>;
 
   return (
     <div className="flex justify-center p-10 bg-muted/5">
       <Card className="w-full max-w-7xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-3xl text-center">All Packages</CardTitle>
-        </CardHeader>
+        <div className="flex justify-between">
+          <CardHeader>
+            <CardTitle className="text-3xl ">All Packages</CardTitle>
+          </CardHeader>
+          <Button>AddPackage</Button>
+        </div>
+        
         <CardContent>
           <div className="overflow-x-auto">
             <Table className="mx-auto text-base">
@@ -109,15 +116,19 @@ export default function PackageTablePage() {
                     <TableCell className="font-medium">{pkg.title}</TableCell>
                     <TableCell>{pkg.slug}</TableCell>
                     <TableCell>₹{pkg.price.toLocaleString()}</TableCell>
-                    <TableCell className="capitalize">{pkg.billingCycle}</TableCell>
-                    <TableCell>
-                      {pkg.serviceIds?.map((s) => s.title).join(', ')}
+                    <TableCell className="capitalize">
+                      {pkg.billingCycle}
                     </TableCell>
-                    <TableCell>{pkg.features?.join(', ')}</TableCell>
+                    <TableCell>
+                      {pkg.serviceIds?.map((s) => s.title).join(", ")}
+                    </TableCell>
+                    <TableCell>{pkg.features?.join(", ")}</TableCell>
                     {/* FIX: Display category name instead of object */}
                     <TableCell>{pkg.category?.name}</TableCell>
-                    <TableCell>{pkg.isFeatured ? 'Yes' : 'No'}</TableCell>
-                    <TableCell className="font-mono">{pkg.planId || '—'}</TableCell>
+                    <TableCell>{pkg.isFeatured ? "Yes" : "No"}</TableCell>
+                    <TableCell className="font-mono">
+                      {pkg.planId || "—"}
+                    </TableCell>
                     <TableCell>
                       <Button
                         size="sm"
@@ -125,10 +136,10 @@ export default function PackageTablePage() {
                         onClick={() => handleCreatePlan(pkg._id)}
                       >
                         {processingId === pkg._id
-                          ? 'Creating...'
+                          ? "Creating..."
                           : pkg.planId
-                          ? 'Created'
-                          : 'Create Plan'}
+                          ? "Created"
+                          : "Create Plan"}
                       </Button>
                     </TableCell>
                   </TableRow>
