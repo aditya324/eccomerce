@@ -1,27 +1,29 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import axios from 'axios';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
-import { BASEURL } from '@/constants';
+import { useEffect, useState } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { BASEURL } from "@/constants";
 
+// FIX 1: Update the schema for 'features' to be an array of objects.
 const packageSchema = z.object({
-  title: z.string().min(3),
-  slug: z.string(),
-  price: z.coerce.number().nonnegative(),
-  billingCycle: z.enum(['monthly', 'yearly']),
-  planId: z.string(),
-  serviceIds: z.array(z.string().min(1)).min(1, 'At least one service is required'),
-  features: z.array(z.string().min(1)).min(1),
-  category: z.string().min(1),
-  isFeatured: z.boolean()
+  title: z.string().min(3, "Title must be at least 3 characters."),
+  slug: z.string().min(1, "Slug is required."),
+  price: z.coerce.number().nonnegative("Price must be a positive number."),
+  billingCycle: z.enum(["monthly", "yearly"]),
+  serviceIds: z.array(z.string()).min(1, "At least one service must be selected."),
+  features: z.array(z.object({
+      value: z.string().min(1, "Feature cannot be empty."),
+    })).min(1, "At least one feature is required."),
+  category: z.string().min(1, "A category must be selected."),
+  isFeatured: z.boolean(),
 });
 
 type FormData = z.infer<typeof packageSchema>;
@@ -33,151 +35,159 @@ export default function AddPackagePage() {
   const {
     register,
     handleSubmit,
-    setValue,
-  
     control,
-    watch,
     formState: { errors },
-    reset
+    reset,
   } = useForm<FormData>({
     resolver: zodResolver(packageSchema),
     defaultValues: {
       serviceIds: [],
-      features: [''],
-      isFeatured: false
-    }
+      features: [],
+      isFeatured: false,
+      billingCycle: "monthly",
+      category: "",
+    },
   });
 
-  const { fields: featureFields, append: appendFeature } = useFieldArray({ control,  name: 'features' as never });
+  const { fields: featureFields, append: appendFeature, remove: removeFeature } = useFieldArray({
+    control,
+    name: "features",
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [svcRes, catRes] = await Promise.all([
           axios.get(`${BASEURL}/service/getAllService`),
-          axios.get(`${BASEURL}/categories/getAllCategory`)
+          axios.get(`${BASEURL}/categories/getAllCategory`),
         ]);
         setServices(svcRes.data.service || []);
         setCategories(catRes.data || []);
       } catch (err) {
-        toast.error('Failed to fetch services or categories');
+        toast.error("Failed to fetch services or categories");
       }
     };
     fetchData();
   }, []);
 
-  const selectedServiceIds = watch('serviceIds');
+ const onSubmit = async (data: FormData) => {
+ 
 
-  const onSubmit = async (data: FormData) => {
-    try {
-      await axios.post(`${BASEURL}/package/add`, data, {
-        withCredentials: true
-      });
-      toast.success('Package created successfully!');
-      reset();
-    } catch (err) {
-      toast.error('Failed to create package');
-    }
+
+  const transformedFeatures = data.features.map(feature => feature.value);
+  
+
+  const payload = {
+    ...data,
+    features: transformedFeatures, 
+  };
+
+
+  console.log("Data being sent to API:", payload);
+
+  try {
+
+    await axios.post(`${BASEURL}/package/add`, payload, {
+      withCredentials: true,
+    });
+    toast.success("Package created successfully! 🎉");
+    reset();
+  } catch (err) {
+    toast.error("Failed to create package.");
+    console.error("Submission Error:", err);
+  }
+};
+
+  const onError = (formErrors: any) => {
+    console.log("VALIDATION ERRORS:", formErrors);
+    toast.error("Please fix the errors shown on the form.");
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-8">
       <h1 className="text-3xl font-bold mb-6">Add New Package</h1>
       <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-5xl"
+        onSubmit={handleSubmit(onSubmit, onError)}
+        className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl"
       >
-        <Card>
-          <CardContent className="p-4 space-y-2">
-            <Label>Title</Label>
-            <Input {...register('title')} placeholder="Package Title" />
-          </CardContent>
-        </Card>
+        {/* Other form fields remain the same... */}
+        <div className="space-y-2">
+          <Label htmlFor="title">Title</Label>
+          <Input id="title" {...register("title")} placeholder="Package Title" />
+          {errors.title && <p className="text-sm text-red-500">{errors.title.message}</p>}
+        </div>
 
-        <Card>
-          <CardContent className="p-4 space-y-2">
-            <Label>Slug</Label>
-            <Input {...register('slug')} placeholder="slug-url" />
-          </CardContent>
-        </Card>
+        <div className="space-y-2">
+          <Label htmlFor="slug">Slug</Label>
+          <Input id="slug" {...register("slug")} placeholder="package-slug" />
+          {errors.slug && <p className="text-sm text-red-500">{errors.slug.message}</p>}
+        </div>
 
-        <Card>
-          <CardContent className="p-4 space-y-2">
-            <Label>Price</Label>
-            <Input type="number" {...register('price')} placeholder="Package Price" />
-          </CardContent>
-        </Card>
+        <div className="space-y-2">
+          <Label htmlFor="price">Price</Label>
+          <Input id="price" type="number" step="0.01" {...register("price")} placeholder="e.g., 49.99" />
+          {errors.price && <p className="text-sm text-red-500">{errors.price.message}</p>}
+        </div>
 
-        <Card>
-          <CardContent className="p-4 space-y-2">
-            <Label>Billing Cycle</Label>
-            <select {...register('billingCycle')} className="w-full border rounded px-3 py-2">
-              <option value="monthly">Monthly</option>
-              <option value="yearly">Yearly</option>
-            </select>
-          </CardContent>
-        </Card>
+        <div className="space-y-2">
+          <Label htmlFor="billingCycle">Billing Cycle</Label>
+          <select id="billingCycle" {...register("billingCycle")} className="w-full border rounded px-3 py-2 bg-background">
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+          </select>
+        </div>
 
-        {/* <Card>
-          <CardContent className="p-4 space-y-2">
-            <Label>Plan ID</Label>
-            <Input {...register('planId')} placeholder="e.g. basic-001" />
-          </CardContent>
-        </Card> */}
-
-        <Card>
-          <CardContent className="p-4 space-y-2">
-            <Label>Category</Label>
-            <select {...register('category')} className="w-full border rounded px-3 py-2">
-              <option value="">Select a category</option>
-              {categories.map((cat) => (
-                <option key={cat._id} value={cat._id}>{cat.name}</option>
-              ))}
-            </select>
-          </CardContent>
-        </Card>
+        <div className="space-y-2 md:col-span-2">
+          <Label htmlFor="category">Category</Label>
+          <select id="category" {...register("category")} className="w-full border rounded px-3 py-2 bg-background">
+            <option value="">Select a category...</option>
+            {categories.map((cat) => (
+              <option key={cat._id} value={cat._id}>{cat.name}</option>
+            ))}
+          </select>
+          {errors.category && <p className="text-sm text-red-500">{errors.category.message}</p>}
+        </div>
 
         <Card className="md:col-span-2">
           <CardHeader><CardTitle>Services</CardTitle></CardHeader>
-          <CardContent className="p-4 space-y-2">
-            <div className="grid grid-cols-2 gap-2">
-             {services.map((svc) => (
-  <label key={svc._id} className="flex items-center gap-2">
-    <input
-      type="checkbox"
-      value={svc._id}
-      checked={selectedServiceIds.includes(svc._id)}
-      onChange={(e) => {
-        const isChecked = e.target.checked;
-        const updated = isChecked
-          ? [...selectedServiceIds, svc._id]
-          : selectedServiceIds.filter((id) => id !== svc._id);
-        setValue('serviceIds', updated, { shouldValidate: true });
-      }}
-    />
-    {svc.title}
-  </label>
-))}
+          <CardContent className="p-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {services.map((svc) => (
+                <label key={svc._id} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    value={svc._id}
+                    {...register("serviceIds")}
+                  />
+                  {svc.title}
+                </label>
+              ))}
             </div>
+            {errors.serviceIds && <p className="text-sm text-red-500 mt-4">{errors.serviceIds.message}</p>}
           </CardContent>
         </Card>
 
         <Card className="md:col-span-2">
           <CardHeader><CardTitle>Features</CardTitle></CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-4">
             {featureFields.map((field, index) => (
-              <Input key={field.id} {...register(`features.${index}`)} placeholder={`Feature ${index + 1}`} />
+              <div key={field.id} className="flex items-center gap-2">
+                {/* FIX 2: Register the 'value' property of the feature object. */}
+                <Input {...register(`features.${index}.value`)} placeholder={`Feature ${index + 1}`} />
+                <Button type="button" variant="destructive" onClick={() => removeFeature(index)}>Remove</Button>
+              </div>
             ))}
-            <Button type="button" onClick={() => appendFeature('')}>+ Add Feature</Button>
+            {/* Displaying potential errors for the features array */}
+            {errors.features && <p className="text-sm text-red-500">{errors.features.root?.message}</p>}
+            {/* FIX 3: Append a new feature object, not an empty string. */}
+            <Button type="button" variant="secondary" onClick={() => appendFeature({ value: "" })}>+ Add Feature</Button>
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-2">
-          <CardContent className="flex items-center gap-2">
-            <input type="checkbox" {...register('isFeatured')} />
-            <Label>Mark as Featured</Label>
-          </CardContent>
-        </Card>
+        <div className="flex items-center gap-2 p-4 border rounded-md">
+          <input id="isFeatured" type="checkbox" {...register("isFeatured")} className="h-4 w-4" />
+          <Label htmlFor="isFeatured">Mark as Featured</Label>
+        </div>
 
         <div className="md:col-span-2">
           <Button type="submit" className="w-full">Create Package</Button>
