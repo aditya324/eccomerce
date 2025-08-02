@@ -83,3 +83,58 @@ export const getCategoryBySlug = async (req, res) => {
   }
 };
 
+
+
+export const deleteCategory = async (req,res)=>{
+  try {
+
+    const {id}= req.params
+
+    if(!id){
+      res.json("id is required ")
+    }
+
+
+
+    const category= await Category.findByIdAndDelete(id)
+
+
+    res.status(200).json("category deleted successfully" , category)
+
+    
+  } catch (error) {
+    console.log("error deleting",error)
+  }
+}
+
+
+
+export const updateCategory = async (req, res) => {
+  const { id } = req.params;
+  const { name, slug } = req.body;
+
+  try {
+    if (!id) {
+      return res.status(400).json({ message: "Category ID is required" });
+    }
+
+    const updatedCategory = await Category.findByIdAndUpdate(
+      id,
+      { name, slug },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedCategory) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    return res.status(200).json({
+      message: "Category updated successfully",
+      category: updatedCategory,
+    });
+  } catch (error) {
+    console.error("Error updating category:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+

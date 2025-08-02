@@ -43,6 +43,11 @@ export interface Service {
 }
 
 
+export interface OohApiResponse {
+  service: Service[];
+}
+
+
 // types/oohService.ts
 
 export type OohPackage = {
@@ -78,3 +83,6 @@ export type OohService = {
   createdAt: string;
   updatedAt: string;
 };
+
+
+

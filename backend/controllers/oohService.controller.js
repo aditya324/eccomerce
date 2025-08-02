@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import OOHService from "../models/oohService.model.js";
 import { razorpay } from "../utils/razorpay.js";
 import User from "../models/user.model.js"
-// Create a new OOH service
+
 export const createOOHService = async (req, res) => {
   try {
     const service = new OOHService(req.body);
@@ -48,7 +48,7 @@ export const updateOOHService = async (req, res) => {
   }
 };
 
-// Delete OOH service by ID
+
 export const deleteOOHService = async (req, res) => {
   try {
     const service = await OOHService.findByIdAndDelete(req.params.id);
@@ -232,7 +232,7 @@ export const createOohServicePackagePlan = async (req, res) => {
 export const subscribeToOohService = async (req, res) => {
   try {
     const { oohserviceId, pkgId } = req.params;
-    const userId = req.user._id; // Make sure `protect` middleware adds this
+    const userId = req.user._id; 
 
     if (!mongoose.Types.ObjectId.isValid(oohserviceId)) {
       return res.status(400).json({ message: "Invalid service ID format" });
@@ -296,3 +296,61 @@ export const subscribeToOohService = async (req, res) => {
     });
   }
 };
+
+
+
+export const getAllMyOohSubscriptions = async (req,res)=>{
+try {
+  const userId = req.user.id;
+
+
+
+  const user = await User.findById(userId)
+      .select("oohSubscriptions") 
+      .populate([
+        {
+          path: "oohSubscriptions.oohServiceId",
+          model: "OOHService",
+          select: "title thumbnail vendorName slug", 
+        },
+        {
+          path: "oohSubscriptions.packageId",
+          model: "Package",
+          select: "title price billingCycle features",
+        },
+      ]);
+
+
+       if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+
+    res.json(user.oohSubscriptions)
+
+    
+
+
+} catch (error) {
+   console.error("Error fetching OOH subscriptions:", error.message);
+    res.status(500).send("Server Error");
+}
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

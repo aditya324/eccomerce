@@ -27,7 +27,7 @@ export async function middleware(request: NextRequest) {
     });
 
 
-    console.log("res", res)
+    
 
     if (!res.ok) {
         throw new Error("Auth check failed");

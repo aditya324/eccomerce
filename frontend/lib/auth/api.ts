@@ -1,6 +1,6 @@
 import { BASEURL } from "@/constants";
 import { Category, CategoryWithServicesResponse } from "@/types/category";
-import { Service } from "@/types/Ooh";
+import { OohApiResponse, Service } from "@/types/Ooh";
 import { GetServicesResponse } from "@/types/service";
 import { GoogleCredentialPayload } from "@/types/user";
 
@@ -109,10 +109,11 @@ export const getAllExcept = async (
   }
 };
 
-export const getAllOohService = async (): Promise<Service[]> => {
+export const getAllOohService = async (): Promise<OohApiResponse> => {
   try {
-    const res = await axios.get<Service[]>(`${BASEURL}/oohservices/`);
+    const res = await axios.get<OohApiResponse>(`${BASEURL}/oohservices/`);
 
+    console.log("fetchooh",res.data)
     return res.data;
   } catch (error) {
     console.log(error);

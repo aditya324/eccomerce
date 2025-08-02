@@ -1,7 +1,7 @@
 "use client";
 import { getAllExcept, getAllOohService, getAllService } from "@/lib/auth/api";
 import { GetServicesResponse } from "@/types/service";
-import { Service } from "@/types/Ooh";
+import { OohApiResponse, Service } from "@/types/Ooh";
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -22,7 +22,7 @@ export const useServiceExcept = (id: string) => {
 
 
 export const useOoh = ()=>{
-  return useQuery<Service[]>({
+  return useQuery<OohApiResponse>({
     queryKey:["oohService"],
     queryFn:()=>getAllOohService()
   })

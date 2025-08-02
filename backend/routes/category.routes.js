@@ -1,6 +1,6 @@
 import express from "express";
 
-import { createCategory, getAllCategory, getCategoryById, getCategoryBySlug } from "../controllers/category.controller.js";
+import { createCategory, deleteCategory, getAllCategory, getCategoryById, getCategoryBySlug, updateCategory } from "../controllers/category.controller.js";
 import protect from "../middlewares/authMiddleware.js";
 import { isAdmin } from "../middlewares/isAdmin.js";
 
@@ -13,7 +13,9 @@ router.get("/getAllCategory",getAllCategory)
 router.get("/:id",getCategoryById)
 router.get("/slug/:slug", getCategoryBySlug);
 
+router.delete('/delete/:id', deleteCategory)
 
+router.post('/update/:id', updateCategory)
 
 
 export default router

@@ -14,7 +14,7 @@ import { BASEURL } from '@/constants';
 const categorySchema = z.object({
   name: z.string().min(1, 'Name is required'),
   slug: z.string().min(1, 'Slug is required'),
-  icon: z.string().url('Icon must be a valid URL'),
+  // icon: z.string().url('Icon must be a valid URL'),
 });
 
 type CategoryForm = z.infer<typeof categorySchema>;
@@ -62,11 +62,11 @@ export default function AddCategoryPage() {
               {errors.slug && <p className="text-sm text-red-500">{errors.slug.message}</p>}
             </div>
 
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label htmlFor="icon">Icon URL</Label>
               <Input id="icon" {...register('icon')} placeholder="https://example.com/icon.png" />
               {errors.icon && <p className="text-sm text-red-500">{errors.icon.message}</p>}
-            </div>
+            </div> */}
 
             <Button type="submit" className="w-full">
               Add Category

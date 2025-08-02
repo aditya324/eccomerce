@@ -353,7 +353,7 @@ export default function UpdateServicePage() {
                   title: "",
                   price: 0,
                   billingCycle: "",
-                  features: ["", ""], // Match the hardcoded feature inputs
+                  features: ["", ""], 
                 })
               }
             >

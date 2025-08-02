@@ -232,32 +232,21 @@ export const subscribeToPackage = async (req, res) => {
 
 export const getMyPurchasedPackages = async (req, res) => {
   try {
-    // 1. Get the user ID from your authentication middleware.
     const userId = req.user.id;
 
-    console.log(userId, "userId")
-
-    // 2. Find the user by their ID.
-    const user = await User.findById(userId)
-
-
-    console.log("user", user)
-      // 3. Populate the package details for each subscription.
-      .populate({
-        path: "packageSubscriptions.packageId",
-        model: "Package",
-        // You can select specific fields from the Package model
-        // select: 'name description price imageUrl'
-      })
-      .exec();
+    const user = await User.findById(userId).populate({
+      path: "packageSubscriptions.packageId",
+      model: "Package",
+      
+    });
 
     if (!user) {
       return res.status(404).json({ msg: "User not found" });
     }
 
-    // 4. Return the array of populated package subscriptions.
-    res.json(user.packageSubscriptions);
 
+    res.json(user.packageSubscriptions);
+    
   } catch (error) {
     console.error("Error fetching user packages:", error.message);
     res.status(500).send("Server Error");
