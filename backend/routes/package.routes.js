@@ -8,6 +8,8 @@ import {
   createStandalonePackagePlan,
   subscribeToPackage,
   getMyPurchasedPackages,
+  deletePackage,
+  updatePackage,
 } from "../controllers/package.controller.js";
 import protect from "../middlewares/authMiddleware.js";
 import { isAdmin } from "../middlewares/isAdmin.js";
@@ -31,6 +33,10 @@ router.get("/slug/:slug", getPacakgeByCategory);
 
 // The most general dynamic route is last
 router.get("/:id", getPackageById); // MOVED DOWN
+
+
+router.delete("/delete/:id", deletePackage)
+router.put('/update/:id', updatePackage);
 
 
 export default router;

@@ -15,7 +15,7 @@ router.get("/slug/:slug", getCategoryBySlug);
 
 router.delete('/delete/:id', deleteCategory)
 
-router.post('/update/:id', updateCategory)
+router.put('/update/:id', updateCategory)
 
 
 export default router

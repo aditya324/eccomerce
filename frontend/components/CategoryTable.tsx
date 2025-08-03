@@ -31,6 +31,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { BASEURL } from '@/constants';
+import Link from 'next/link';
 
 type Category = {
   _id: string;
@@ -83,9 +84,14 @@ export default function CategoryTable({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => router.push(`/admin/categories/edit/${category._id}`)}
+              asChild
+             
             >
+
+              <Link href={`/dashboard/editCategory/${category._id}`}>
               Edit
+              </Link>
+              
             </Button>
             <Button
               variant="destructive"
