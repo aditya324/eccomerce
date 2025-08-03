@@ -86,3 +86,34 @@ export type OohService = {
 
 
 
+export interface OohServiceDetails {
+  _id: string;
+  title: string;
+  slug: string;
+  vendorName: string;
+  thumbnail: string;
+}
+
+// An interface for a single payment log entry
+export interface RenewalLog {
+  paymentId: string;
+  date: string;
+  amount: number;
+  status: string;
+}
+
+// The main interface for the OohSubscription
+// This is the interface you are trying to import in your component
+export interface OohSubscription {
+  oohServiceId: OohServiceDetails; // This field is populated
+  packageId: string | null;
+  subscriptionId: string;
+  status: 'active' | 'created' | 'cancelled'; // Or whatever statuses you have
+  currentStart: string;
+  currentEnd: string | null;
+  paymentId: string | null;
+  paymentStatus: string;
+  paymentSignature: string;
+  nextBillingDate: string | null;
+  renewalLogs: RenewalLog[];
+}

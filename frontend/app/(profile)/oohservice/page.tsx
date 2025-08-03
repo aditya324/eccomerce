@@ -15,10 +15,12 @@ const formatDate = (dateString: string | null) => {
   });
 };
 
-// --- Individual OOH Service Card Component ---
+
 const OohServiceCard: React.FC<{ subscription: OohSubscription }> = ({ subscription }) => {
   const { oohServiceId, status, currentStart, subscriptionId, paymentStatus } = subscription;
 
+
+ 
   // Define styles for different statuses
   const statusStyles: { [key: string]: string } = {
     active: 'bg-green-100 text-green-800',
