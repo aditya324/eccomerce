@@ -13,6 +13,9 @@ import {
 import PricingCards from "@/components/PricingCards";
 import ServiceWishlistButton from "@/components/ServiceWishlistButton";
 
+// ✅ This tells Next.js to always render the page on-demand
+export const dynamic = 'force-dynamic';
+
 // Define the Service interface
 interface Service {
   _id: string;
@@ -27,29 +30,13 @@ interface Service {
   videoUrl: string;
 }
 
-// ✅ STEP 1: Add this function back. It tells Next.js which pages to build.
-export async function generateStaticParams() {
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/service/getAllServices`);
-    if (!res.ok) {
-      console.error("Failed to fetch services for static generation");
-      return [];
-    }
-    const services: Service[] = await res.json();
-    return services.map((service) => ({
-      id: service._id,
-    }));
-  } catch (error) {
-    console.error(error);
-    return [];
-  }
-}
+// ❌ The generateStaticParams function has been REMOVED.
 
 // This function fetches data for a single page on the server
 async function getService(id: string): Promise<Service | undefined> {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/service/getServiceById/${id}`, {
-      next: { revalidate: 3600 },
+      cache: 'no-store', // Important: Don't cache data for a dynamic page
     });
     if (!res.ok) {
       return undefined;
@@ -120,7 +107,7 @@ export default async function ServiceDetails({ params }: { params: { id: string 
             {service.includes.map((item, index) => (
               <li key={index}>{item}</li>
             ))}
-          /</ul>
+          </ul>
         </div>
       </div>
       <div className="flex justify-center mt-20">
@@ -143,7 +130,7 @@ export default async function ServiceDetails({ params }: { params: { id: string 
         <h1 className="flex justify-center font-bold text-4xl text-[#333333] font-inter">
           Trusted by 600+ clients
         </h1>
-        <TrustedByLogos />
+        {/* <TrustedByLogos /> */}
       </div>
       <WhyChooseUs />
       <div className="bg-gray-50 py-12 px-6 md:px-20">
