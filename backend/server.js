@@ -36,9 +36,22 @@ connectDB();
 app.use("/razorpay/webhook", express.raw({ type: "application/json" }), webhookRoutes);
 
 // Middlewares
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "https://eccomerce-3idj.vercel.app"
+];
+
 app.use(
   cors({
-    origin: ["http://localhost:3001", "http://localhost:3000"], // your frontend port
+    origin: function (origin, callback) {
+     
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
