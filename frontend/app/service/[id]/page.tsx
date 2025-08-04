@@ -1,6 +1,5 @@
 // FILE: app/service/[id]/page.tsx
 
-// No "use client" - this is now a Server Component
 import { notFound } from "next/navigation";
 import TrustedByLogos from "@/components/TrustedByLogos";
 import WhyChooseUs from "@/components/WhyChooseUs";
@@ -28,7 +27,25 @@ interface Service {
   videoUrl: string;
 }
 
-// This function fetches your data on the server
+// ✅ STEP 1: Add this function back. It tells Next.js which pages to build.
+export async function generateStaticParams() {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/service/getAllServices`);
+    if (!res.ok) {
+      console.error("Failed to fetch services for static generation");
+      return [];
+    }
+    const services: Service[] = await res.json();
+    return services.map((service) => ({
+      id: service._id,
+    }));
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+// This function fetches data for a single page on the server
 async function getService(id: string): Promise<Service | undefined> {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/service/getServiceById/${id}`, {
@@ -44,16 +61,15 @@ async function getService(id: string): Promise<Service | undefined> {
   }
 }
 
+// The main page component
 export default async function ServiceDetails({ params }: { params: { id: string } }) {
-  // ✅ Destructure 'id' from params at the top
   const { id } = params;
-  const service = await getService(id); // Use the 'id' variable here
+  const service = await getService(id);
 
   if (!service) {
     notFound();
   }
 
-  // Your original JSX works here, now with server-fetched data
   return (
     <div>
       <div className="flex flex-col md:flex-row justify-center items-start gap-6 px-4 py-12 bg-white">
@@ -77,7 +93,6 @@ export default async function ServiceDetails({ params }: { params: { id: string 
             <p className="text-2xl font-semibold text-orange-600">
               ₹{service.price}
             </p>
-            {/* ✅ Use the 'id' variable, NOT 'params.id' */}
             <ServiceWishlistButton serviceId={id} />
             <button className="bg-yellow-400 hover:bg-yellow-500 transition text-white w-full py-2 rounded font-semibold">
               Add to cart
@@ -105,7 +120,7 @@ export default async function ServiceDetails({ params }: { params: { id: string 
             {service.includes.map((item, index) => (
               <li key={index}>{item}</li>
             ))}
-          </ul>
+          /</ul>
         </div>
       </div>
       <div className="flex justify-center mt-20">
@@ -122,7 +137,6 @@ export default async function ServiceDetails({ params }: { params: { id: string 
         </div>
       </div>
       <div className="p-10">
-        {/* ✅ Use the 'id' variable, NOT 'params.id' */}
         <PricingCards packages={service.packages} serviceId={id} />
       </div>
       <div className="py-12">
@@ -161,7 +175,6 @@ export default async function ServiceDetails({ params }: { params: { id: string 
           ))}
         </Accordion>
       </div>
-      {/* ✅ Use the 'id' variable, NOT 'params.id' */}
       <AllServiceExcept id={id} />
     </div>
   );
