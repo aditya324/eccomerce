@@ -1,4 +1,6 @@
 
-export default function Test() {
-  return <h1>Service Page Works ✅</h1>;
+
+
+export default function ServicePage() {
+  return <div style={{ padding: 100 }}>✅ Dynamic Route Works</div>;
 }
