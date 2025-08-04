@@ -39,7 +39,7 @@ app.use("/razorpay/webhook", express.raw({ type: "application/json" }), webhookR
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
-  "https://eccomerce-3idj.vercel.app"
+  "https://eccomerce-ten-jet.vercel.app"
 ];
 
 app.use(
