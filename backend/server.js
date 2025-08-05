@@ -40,7 +40,9 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
   "https://eccomerce-frontend2.onrender.com",
-  "https://eccomerce-ten-jet.vercel.app"
+  "https://eccomerce-ten-jet.vercel.app",
+  "https://eccomerce-vuc3.onrender.com/"
+
 ];
 
 app.use(
@@ -110,6 +112,19 @@ app.use((req, res, next) => {
   console.log("❌ No route matched:", req.method, req.originalUrl);
   res.status(404).send("Not Found");
 });
+
+
+if (process.env.NODE_ENV === "production") {
+  const __dirname = path.resolve(); 
+
+
+  app.use(express.static(path.join(__dirname, "/frontend/out")));
+
+
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname, "frontend", "out", "index.html"))
+  );
+}
 
 // Start server
 app.listen(PORT, () => {
