@@ -28,14 +28,14 @@ import subscriptionRoutes from "./routes/subscriptions.route.js"
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// Connect to MongoDB
+
 connectDB();
 
 
 
 app.use("/razorpay/webhook", express.raw({ type: "application/json" }), webhookRoutes);
 
-// Middlewares
+
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
@@ -59,9 +59,9 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 
-// Logging setup
+
 if (process.env.NODE_ENV === "production") {
-  // Create logs directory if not exists
+
   const logDirectory = path.join("logs");
   if (!fs.existsSync(logDirectory)) {
     fs.mkdirSync(logDirectory);
