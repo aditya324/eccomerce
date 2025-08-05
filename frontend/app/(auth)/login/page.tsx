@@ -33,7 +33,7 @@ export default function LoginPage() {
       onSuccess: (data: any) => {
         toast.success("account logged in successfully");
 
-        console.log("Login Data:", data); // Already here
+        console.log("Login Data:", data); 
         console.log("Role Check Passed:", data.role);
         if (data?.role === "admin") {
           console.log("Redirecting to /dashboard");

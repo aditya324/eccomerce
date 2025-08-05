@@ -2,12 +2,14 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-import { BASEURL } from './constants';
 
 
 
 export async function middleware(request: NextRequest) {
   const sessionCookie = request.cookies.get('jwt'); 
+
+
+  console.log(sessionCookie)
 
 
 
@@ -18,8 +20,8 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    // 2. Verify the session on your backend
-    const res = await fetch(`${BASEURL}/users/check`, {
+  
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/check`, {
       headers: {
    
         Cookie: `jwt=${sessionCookie.value}`,
