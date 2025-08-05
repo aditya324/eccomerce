@@ -32,11 +32,14 @@ export default function LoginPage() {
     login.mutate(form, {
       onSuccess: (data: any) => {
         toast.success("account logged in successfully");
-        console.log(data, "login data");
-        if ( data?.role === "admin") {
 
+        console.log("Login Data:", data); // Already here
+        console.log("Role Check Passed:", data.role);
+        if (data?.role === "admin") {
+          console.log("Redirecting to /dashboard");
           router.push("/dashboard");
         } else {
+          console.log("Redirecting to /");
           router.push("/"); // or wherever users go
         }
 
