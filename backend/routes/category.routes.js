@@ -10,8 +10,8 @@ const router=express.Router()
 
 router.post("/addCategory",protect,isAdmin,createCategory)
 router.get("/getAllCategory",getAllCategory)
-router.get("/:id",getCategoryById)
-router.get("/slug/:slug", getCategoryBySlug);
+router.get("/slug/:slug", getCategoryBySlug);  
+router.get("/:id", getCategoryById);
 
 router.delete('/delete/:id', deleteCategory)
 

@@ -12,7 +12,7 @@ router.get("/check", checkAuth);
 router.post("/logout", logoutUser);
 router.post("/forgot-password",  forgotPassword);
 router.post("/reset-password/:token", resetPassword);
-router.get('/:id', protect, getUserById);
+router.get('/user/:id', protect, getUserById);
 
 
 

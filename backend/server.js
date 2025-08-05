@@ -1,140 +1,155 @@
 import express from "express";
 
-import cors from "cors";
+import next from "next";
 
 import dotenv from "dotenv";
 
+import cors from "cors";
+
 import morgan from "morgan";
+
+import cookieParser from "cookie-parser";
 
 import fs from "fs";
 
 import path from "path";
 
-import cookieParser from "cookie-parser";
-
+import cartRoutes from "./routes/cart.routes.js";
+import categoryRoutes from "./routes/category.routes.js";
+import oohServiceRoutes from "./routes/oohService.routes.js";
+import packageRoutes from "./routes/package.routes.js";
+import paymentRoutes from "./routes/payment.routes.js";
+import s3Routes from "./routes/s3Routes.js";
+import serviceRoutes from "./routes/service.routes.js";
+import subscriptionRoutes from "./routes/subscriptions.route.js";
+import userRoutes from "./routes/user.routes.js";
 import webhookRoutes from "./routes/webhookRoutes.js";
+import wishlistRoutes from "./routes/wishlist.routes.js";
 import connectDB from "./utils/db.js";
-import userRoutes from "./routes/user.routes.js"
-import categoryRoutes from  "./routes/category.routes.js"
-import serviceRoutes from "./routes/service.routes.js"
-import cartRoutes from "./routes/cart.routes.js"
-import packageRoutes from "./routes/package.routes.js"
-import paymentRoutes from "./routes/payment.routes.js"
-import wishlistRoutes from "./routes/wishlist.routes.js"
-import s3Routes from "./routes/s3Routes.js"
-import oohServiceRoutes from "./routes/oohService.routes.js"
-import subscriptionRoutes from "./routes/subscriptions.route.js"
 
+const dev = process.env.NODE_ENV !== "production";
+const nextApp = next({ dev, dir: "../frontend" });
+const handle = nextApp.getRequestHandler();
 
-
-dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-
-// ===================================================================================
-// STEP 1: RUN THE FILE EXACTLY LIKE THIS.
-// The server should start successfully. If it crashes even with everything
-// disabled, the problem is likely a corrupted node_modules folder.
-// In that case, delete node_modules and package-lock.json and run `npm install`.
-// ===================================================================================
-
-
-// ===================================================================================
-// STEP 2: UNCOMMENT THE BLOCKS BELOW ONE BY ONE.
-// After uncommenting a block, save the file and see if the server still starts.
-// ===================================================================================
-
-
-
-console.log("Connecting to DB...");
-connectDB();
-
-
-
-
-console.log("Initializing core middleware...");
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
   "https://eccomerce-frontend2.onrender.com",
   "https://eccomerce-ten-jet.vercel.app",
-  "https://eccomerce-vuc3.onrender.com"
+  "https://eccomerce-vuc3.onrender.com",
 ];
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
-app.use(cookieParser());
-app.use(express.json());
-app.use(morgan("dev"));
 
+nextApp.prepare().then(() => {
+  // Connect MongoDB
+  connectDB();
 
+  // Special webhook route BEFORE express.json()
+  app.use("/razorpay/webhook", express.raw({ type: "application/json" }), webhookRoutes);
 
+  // Middleware
+  app.use(
+    cors({
+      origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
+      credentials: true,
+    })
+  );
+  app.use(express.json());
+  app.use(cookieParser());
+  app.use(morgan("dev"));
 
-// --- Block C: Webhook Route (do this one first when adding routes) ---
-// Note: This route is special and needs to be before express.json()
-app.use("/razorpay/webhook", express.raw({ type: "application/json" }), webhookRoutes);
+  // ========== TRY/CATCH Wrapped Routes ==========
 
+  try {
+    app.use("/api/users", userRoutes);
+    console.log("✅ /api/users route loaded");
+  } catch (err) {
+    console.error("❌ /api/users failed:", err.message);
+  }
 
-// ===================================================================================
-// STEP 4: ADD YOUR ROUTES BACK ONE BY ONE. THIS WILL FIND THE CRASH.
-// For each route, you must uncomment BOTH the `import` at the top of the file
-// AND the `app.use()` line below.
-// ===================================================================================
+  try {
+    app.use("/api/categories", categoryRoutes);
+    console.log("✅ /api/categories route loaded");
+  } catch (err) {
+    console.error("❌ /api/categories failed:", err.message);
+  }
 
-// --- Example: Testing userRoutes ---
-// 1. Uncomment `import userRoutes from "./routes/user.routes.js";` at the top.
-// 2. Uncomment the line below.
-// 3. Save. Does it crash? If yes, the error is in `user.routes.js`.
-// 4. If it doesn't crash, `user.routes.js` is safe. Comment these two lines out again and try the next file (e.g., categoryRoutes).
+  try {
+    app.use("/api/service", serviceRoutes);
+    console.log("✅ /api/service route loaded");
+  } catch (err) {
+    console.error("❌ /api/service failed:", err.message);
+  }
 
-// console.log("Initializing API routes...");
+  try {
+    app.use("/api/cart", cartRoutes);
+    console.log("✅ /api/cart route loaded");
+  } catch (err) {
+    console.error("❌ /api/cart failed:", err.message);
+  }
 
-console.log("useroute")
-app.use("/api/users", userRoutes);
-console.log("catroute")
-app.use("/api/categories", categoryRoutes);
-console.log("serroute")
-app.use("/api/service", serviceRoutes);
-console.log("carroute")
-app.use("/api/cart", cartRoutes);
-console.log("packroute")
-app.use("/api/package", packageRoutes);
-console.log("payroute")
-app.use("/api/payments", paymentRoutes);
-console.log("subroute")
-app.use("/api/subscription",subscriptionRoutes)
-console.log("wisroute")
-app.use("/api/wishlist",wishlistRoutes)
-console.log("s3route")
-app.use('/api/s3', s3Routes);
-console.log("oohroute")
-app.use("/api/oohservices", oohServiceRoutes);
+  try {
+    app.use("/api/package", packageRoutes);
+    console.log("✅ /api/package route loaded");
+  } catch (err) {
+    console.error("❌ /api/package failed:", err.message);
+  }
 
+  try {
+    app.use("/api/payments", paymentRoutes);
+    console.log("✅ /api/payments route loaded");
+  } catch (err) {
+    console.error("❌ /api/payments failed:", err.message);
+  }
 
-console.log("out of the order")
+  try {
+    app.use("/api/subscription", subscriptionRoutes);
+    console.log("✅ /api/subscription route loaded");
+  } catch (err) {
+    console.error("❌ /api/subscription failed:", err.message);
+  }
 
+  try {
+    app.use("/api/wishlist", wishlistRoutes);
+    console.log("✅ /api/wishlist route loaded");
+  } catch (err) {
+    console.error("❌ /api/wishlist failed:", err.message);
+  }
 
-// A simple route to prove the server is running
-app.get("/", (req, res) => {
-  res.send("✅ Server is running. Ready to start debugging.");
-});
+  try {
+    app.use("/api/s3", s3Routes);
+    console.log("✅ /api/s3 route loaded");
+  } catch (err) {
+    console.error("❌ /api/s3 failed:", err.message);
+  }
 
- app.all("*", (req, res) => {
+  try {
+    app.use("/api/oohservices", oohServiceRoutes);
+    console.log("✅ /api/oohservices route loaded");
+  } catch (err) {
+    console.error("❌ /api/oohservices failed:", err.message);
+  }
+
+  // Health check route
+  app.get("/api", (req, res) => {
+    res.send("✅ Backend API is running");
+  });
+
+  // Catch-all for Next.js frontend routes
+  app.all("*", (req, res) => {
     return handle(req, res);
   });
 
-
-// The final step: Start the server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  // Start server
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running at http://localhost:${PORT}`);
+  });
 });
