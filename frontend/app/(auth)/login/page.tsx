@@ -33,7 +33,8 @@ export default function LoginPage() {
       onSuccess: (data: any) => {
         toast.success("account logged in successfully");
         console.log(data, "login data");
-        if (data?.user?.role === "admin" || data?.role === "admin") {
+        if ( data?.role === "admin") {
+
           router.push("/dashboard");
         } else {
           router.push("/"); // or wherever users go
