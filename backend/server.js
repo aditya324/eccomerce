@@ -114,6 +114,24 @@ app.use((req, res, next) => {
 });
 
 
+
+if (process.env.NODE_ENV === "production") {
+  const __dirname = path.resolve();
+  // Make the 'out' folder accessible as a static folder
+  app.use(express.static(path.join(__dirname, "/frontend/out")));
+
+  // Any request that is not an API route will be sent the index.html file
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname, "frontend", "out", "index.html"))
+  );
+} else {
+  // In development, just have a simple root route
+  app.get("/", (req, res) => {
+    res.send("API is running...");
+  });
+}
+
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
