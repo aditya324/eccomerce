@@ -1,25 +1,25 @@
-import AllService from "@/components/AllServices";
-import CategoriesSection from "../components/CategoriesSection"
-import HomeScreen from "../components/HomeScreen"
-import DevelopMent from "@/components/Development";
-import Marketing from "@/components/Marketing";
-import Sales from "@/components/Sales";
-import PackageSection from "@/components/PackageSection"
-import AllOohService from "@/components/AllOohService"
-import OutOfHome from "@/components/OutOfHome";
+// 
 
-export default function Home() {
+// ==========================================================
+// TEMPORARY TEST CODE for frontend/app/page.tsx
+// ==========================================================
+
+export default function HomePage() {
   return (
-    <div className="bg-[radial-gradient(circle,_rgba(242,177,4,0.14)_0%,_rgba(242,177,4,0)_100%)]">
-      <CategoriesSection />
-      <HomeScreen />
-      <AllService />
-      <DevelopMent />
-      <PackageSection/>
-      <Marketing />
-      <Sales />
-      <OutOfHome />
-      <AllOohService/>
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+      fontFamily: 'sans-serif',
+      fontSize: '20px',
+      backgroundColor: '#f0f2f5'
+    }}>
+      <div style={{ textAlign: 'center', padding: '40px', border: '1px solid #ccc', borderRadius: '8px', backgroundColor: 'white', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}>
+        <h1 style={{ color: '#1a73e8' }}>It Works!</h1>
+        <p>This minimal test page has loaded successfully.</p>
+        <p>This proves the problem is inside one of your custom components.</p>
+      </div>
     </div>
   );
 }
