@@ -7,7 +7,7 @@ import { BASEURL } from './constants';
 
 
 export async function middleware(request: NextRequest) {
-  const sessionCookie = request.cookies.get('jwt'); // ⚠️ Change to your actual cookie name
+  const sessionCookie = request.cookies.get('jwt'); 
 
 
 

@@ -37,7 +37,9 @@ export default function LoginPage() {
         console.log("Role Check Passed:", data.role);
         if (data?.role === "admin") {
           console.log("Redirecting to /dashboard");
-          router.push("/dashboard");
+          setTimeout(() => {
+            router.push("/dashboard");
+          }, 500);
         } else {
           console.log("Redirecting to /");
           router.push("/"); // or wherever users go
