@@ -114,18 +114,6 @@ app.use((req, res, next) => {
 });
 
 
-if (process.env.NODE_ENV === "production") {
-  const __dirname = path.resolve(); 
-
-
-  app.use(express.static(path.join(__dirname, "/frontend/out")));
-
-
-  app.get("*", (req, res) =>
-    res.sendFile(path.resolve(__dirname, "frontend", "out", "index.html"))
-  );
-}
-
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
